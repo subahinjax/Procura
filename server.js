@@ -23,7 +23,7 @@ const { REQUIRED_RELEASE_DOCS } = require("./constants/poDocuments");
 // in-memory multer for CS file upload (parse only, no disk write)
 const csUpload = multer({ storage: multer.memoryStorage() });
 
-
+const isProd = process.env.NODE_ENV === "production";
 
 app.set("trust proxy", 1);
 
@@ -66,8 +66,8 @@ app.use(session({
   rolling: true,
   cookie: {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     maxAge: 1000 * 60 * 30
   }
 }));
