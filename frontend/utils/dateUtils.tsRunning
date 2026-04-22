@@ -1,0 +1,21 @@
+// ✅ /utils/dateUtils.ts
+export const formatDateIndian = (dateString: string | null) => {
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+
+  const day = String(local.getDate()).padStart(2, "0");
+  const month = String(local.getMonth() + 1).padStart(2, "0");
+  const year = local.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
+
+// ✅ add this back
+export const parseIndianDate = (indianDate: string) => {
+  if (!indianDate) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(indianDate)) return indianDate; // already ISO
+  const [day, month, year] = indianDate.split("-");
+  return `${year}-${month}-${day}`;
+};

@@ -1,0 +1,315 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  height: 100%;
+}
+
+/* ========================================
+   🖨️ PRINT STYLES
+======================================== */
+@media print {
+
+  /* 🔹 Hide buttons and non-print elements */
+  button, .no-print {
+    display: none !important;
+  }
+
+  /* 🔹 Page setup */
+  @page {
+    size: A4 portrait;
+    margin: 15mm 14mm 15mm 14mm;
+  }
+
+  @page:first {
+    margin-top: 30mm;
+    margin-bottom: 30mm;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    overflow: visible !important;
+  }
+
+.print-a4 {
+  width: 210mm;
+  min-height: auto;
+  margin: 0 !important;
+  padding: 0;
+  background: white;
+  box-shadow: none !important;
+  overflow: visible !important;
+  transform-origin: top center;
+
+  /* Base scaling */
+  font-size: calc(16px * var(--print-zoom, 1));
+}
+
+/* Scale line height */
+.print-a4 * {
+  line-height: calc(1.2 * var(--print-zoom, 1)) !important;
+}
+
+/* Override Tailwind arbitrary font sizes */
+.print-a4 .text-\[16px\] {
+  font-size: calc(16px * var(--print-zoom, 1)) !important;
+}
+
+.print-a4 .text-\[15\.5px\] {
+  font-size: calc(15.5px * var(--print-zoom, 1)) !important;
+}
+
+.print-a4 .text-\[15px\] {
+  font-size: calc(15px * var(--print-zoom, 1)) !important;
+}
+
+.print-a4 .text-\[14px\] {
+  font-size: calc(14px * var(--print-zoom, 1)) !important;
+}
+
+.print-a4 .text-sm {
+  font-size: calc(0.875rem * var(--print-zoom, 1)) !important;
+}
+
+.print-a4 .text-base {
+  font-size: calc(1rem * var(--print-zoom, 1)) !important;
+}
+
+.print-a4 .text-lg {
+  font-size: calc(1.125rem * var(--print-zoom, 1)) !important;
+}
+
+.print-a4 .text-xs {
+  font-size: calc(0.75rem * var(--print-zoom, 1)) !important;
+}
+
+
+
+
+
+
+  /* ========================================
+     🔹 PAGE BREAKS
+  ======================================== */
+  .page-break {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+
+  .avoid-break,
+  .print-item-row,
+  .terms-section {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Restore top border after manual page break */
+  .page-break + .approval-group,
+  .page-break + .border-keep,
+  .page-break + .summary-block,
+  .page-break + .totals-block,
+  .page-break + .terms-section {
+    border-top: 1px solid black !important;
+  }
+
+  /* ========================================
+     🔹 BORDER HANDLING
+  ======================================== */
+  .border-keep {
+    position: relative;
+    border-left: 1px solid black !important;
+    border-right: 1px solid black !important;
+    box-sizing: border-box;
+    padding-bottom: 2mm !important;
+ /* Pull borders slightly away from page edge */
+    padding-left: 0.5mm;
+    padding-right: 0.5mm;
+    padding-bottom: -5mm;
+  }
+
+  /* Remove pseudo-element bottom border (caused preview artifact) */
+  .border-keep::after {
+    display: none !important;
+  }
+
+  .first-page.border-keep {
+    padding-bottom: 38mm !important;
+  }
+
+  .first-page .letterhead-mask {
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    bottom: 0;
+    height: 38mm;
+    background: transparent !important;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* ========================================
+     🔹 TABLES
+  ======================================== */
+  thead {
+    display: table-header-group;
+  }
+
+  .po-table {
+    font-size: 11.5pt !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .po-table td {
+    padding-top: 2pt;
+    padding-bottom: 2pt;
+    line-height: 1.2;
+    border: 1px solid black; /* ensures bottom border for last row */
+  }
+
+  .po-table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Kill bottom border before page-break */
+  table.po-table + .page-break tr:last-child td {
+    border-bottom: 0 !important;
+  }
+
+  /* Restore bottom border on last table */
+  table.po-table:last-of-type tr:last-child td {
+    border-bottom: 1px solid black !important;
+  }
+
+  /* ========================================
+     🔹 TERMS & CONDITIONS
+  ======================================== */
+  .terms-section {
+    position: relative;
+    z-index: 50 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .terms-section::before,
+  .terms-section::after {
+    display: none !important;
+  }
+
+  /* ========================================
+     🔹 VENDOR ACCEPTANCE
+  ======================================== */
+  .vendor-acceptance {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .vendor-dash {
+    position: relative;
+    height: 0;
+    margin-top: 1mm;
+  }
+
+  .vendor-dash::before {
+    content: "";
+    display: block;
+    border-top: 2px dashed black;
+  }
+}
+
+/* ========================================
+   💻 SCREEN STYLES (PREVIEW)
+======================================== */
+@media screen {
+
+  .print-a4 {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 16px auto;
+    padding: 0;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    border-bottom: none !important; /* hide extra preview line */
+    outline: none !important;
+    padding-bottom: 3mm; /* 🔑 PREVENT EDGE SNAP */
+    box-sizing: border-box;
+  }
+
+  /* Remove any border pseudo-elements in preview */
+  .print-a4 .border-keep::after {
+    display: none !important;
+  }
+
+  .page-break {
+    border-top: 2px dashed #999;
+    margin: 12px 0;
+    text-align: center;
+    color: #666;
+    font-size: 0.8rem;
+  }
+
+ /* Kill Chrome page boundary line */
+  .print-a4::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .print-a4 .border-keep:last-child {
+    border-bottom: none !important;
+  }
+
+ .print-a4 {
+    position: relative;
+    overflow: hidden; /* 🔑 */
+  }
+
+  .print-a4::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: white; /* mask line */
+    z-index: 9999;
+  }
+
+  .print-a4 {
+    min-height: calc(297mm - 5mm);
+  }
+}
+
+/* ========================================
+   📱 MOBILE VIEW
+======================================== */
+@media screen and (max-width: 900px) {
+  .print-a4 {
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    box-shadow: none;
+  }
+}
+
+/* ========================================
+   🔧 UTILITIES
+======================================== */
+.term-content {
+  white-space: pre-line;
+}
+
+@keyframes toast-pop {
+  0% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.toast-animate {
+  animation: toast-pop 0.3s ease-out forwards;
+}
