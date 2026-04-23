@@ -25,8 +25,6 @@ const csUpload = multer({ storage: multer.memoryStorage() });
 
 const isProd = process.env.NODE_ENV === "production";
 
-app.set("trust proxy", 1);
-
 const otpStore = {};
 
 const transporter = nodemailer.createTransport({
