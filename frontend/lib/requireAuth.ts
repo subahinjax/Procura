@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 export async function requireAuth() {
   try {
     const cookieStore = await cookies();
@@ -14,7 +16,7 @@ export async function requireAuth() {
 
     if (!cookieHeader) return null;
 
-    const res = await fetch("http://10.1.24.102:5001/api/auth/me", {
+    const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
       headers: {
         cookie: cookieHeader, // 🔥 CRITICAL FIX
       },
