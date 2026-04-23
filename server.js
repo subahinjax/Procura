@@ -40,7 +40,8 @@ const transporter = nodemailer.createTransport({
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "http://10.1.24.102:3000"
+    "http://10.1.24.102:3000",
+    "https://your-project.vercel.app"
   ],
   credentials: true,
 }));
@@ -57,6 +58,8 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, "public")));
+
+app.set("trust proxy", 1);
 
 app.use(session({
   name: "connect.sid",
