@@ -13,7 +13,7 @@ import pool from "@/lib/db";
 ===================== */
 export async function GET(req: NextRequest) {
   try {
-    const auth = await requireAuth(req);
+    const auth = await requireAuth();
     if (!auth)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

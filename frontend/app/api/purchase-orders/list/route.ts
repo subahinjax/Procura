@@ -1,35 +1,18 @@
 export const dynamic = "force-dynamic";
-
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/requireAuth";
 import pool from "@/lib/db";
 
 
+
 export async function GET(req: NextRequest) {
   try {
-    // 🔐 STEP 1: Validate session using your EXPRESS backend
-    const cookie = req.headers.get("cookie") || "";
-
-    if (!cookie) {
-       return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-  // 🔐 STEP 1: check session
-    const authCheck = await fetch(`${API_BASE_URL}/api/auth/me`, {
-      headers: {
-        cookie: cookie,
-      },
-      cache: "no-store",
-    });
+    const auth = await requireAuth();
+    if (!auth)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
 
-    // ❌ NOT LOGGED IN
-    if (!authCheck.ok) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // 🔽 STEP 2: Continue your existing logic
-    const filter = req.nextUrl.searchParams.get("filter") || "all";
+    const filter = req.nextUrl.searchParams.get("filter") || "all"; // ✅ Keep this
 
     let whereClause = "";
 

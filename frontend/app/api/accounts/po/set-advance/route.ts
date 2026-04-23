@@ -7,7 +7,7 @@ import pool from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   try {
-    const auth = await requireAuth(req);
+    const auth = await requireAuth();
 
 if (!auth) {
   return new NextResponse("Unauthorized", { status: 401 });

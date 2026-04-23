@@ -8,7 +8,7 @@ import pool from "@/lib/db";
 export async function GET(req: NextRequest) {
   try {
     // 🔐 Session check using shared requireAuth
-    const auth = await requireAuth(req);
+    const auth = await requireAuth();
     if (!auth) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
