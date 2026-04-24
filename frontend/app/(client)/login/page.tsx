@@ -30,22 +30,27 @@ export default function LoginPage() {
 
   if (!hydrated) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (loading) return;
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.success) {
-        alert(data.message || "Invalid username or password");
-        return;
-      }
+const response = await fetch(`${API_BASE_URL}/api/login`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify({ username, password }),
+});
+
+// ✅ Guard before parsing JSON
+let data: any = {};
+try {
+  data = await response.json();
+} catch {
+  console.error("❌ Response was not JSON:", response.status, response.url);
+  alert("Server error. Please try again later.");
+  return;
+}
+
+if (!response.ok || !data.success) {
+  alert(data.message || "Invalid username or password");
+  return;
+}
       setUser({ username: data.username, user_type: data.user_type });
       router.replace("/");
     } catch (error) {
