@@ -45,6 +45,17 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+
+useEffect(() => {
+  fetch(`${API_BASE_URL}/api/auth/me`, { credentials: "include" })
+    .then(res => {
+      if (!res.ok) window.location.href = "/login";
+    })
+    .catch(() => window.location.href = "/login");
+}, []);
+
+
+
 export default function RootLayout({
   children,
 }: {
