@@ -39,7 +39,8 @@ app.use(cors({
   origin: [
     "http://localhost:3000",
     "http://10.1.24.102:3000",
-    "https://your-project.vercel.app"
+    "https://procura-iota.vercel.app",
+     /https:\/\/procura-.*\.vercel\.app$/,
   ],
   credentials: true,
 }));
