@@ -36,6 +36,9 @@ const handleSubmit = async (e: React.FormEvent) => {
   if (loading) return;
 
   setLoading(true);
+  console.log("🚀 Submitting login...");
+  console.log("🔗 API_BASE_URL:", API_BASE_URL);
+
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/login`, {
@@ -45,10 +48,15 @@ const handleSubmit = async (e: React.FormEvent) => {
       body: JSON.stringify({ username, password }),
     });
 
+    console.log("📡 Response status:", response.status);
+    console.log("📡 Response URL:", response.url);
+
+
     let data: any = {};
 
     try {
       data = await response.json();
+      console.log("📦 Response data:", data);
     } catch {
       console.error("❌ Response was not JSON:", response.status, response.url);
       alert("Server error. Please try again later.");
@@ -59,11 +67,14 @@ const handleSubmit = async (e: React.FormEvent) => {
       alert(data.message || "Invalid username or password");
       return;
     }
-
+   
+    console.log("✅ Login success:", data);
     setUser({
       username: data.username,
       user_type: data.user_type,
     });
+
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     router.replace("/");
   } catch (error) {
