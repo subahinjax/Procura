@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // ────────────────────────────────────────────────────────────────────────
 
 try {
-  const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+  const res = await fetch(`/api/auth/me`, {
     credentials: "include",
     cache: "no-store",
   });
