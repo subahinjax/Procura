@@ -42,7 +42,6 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   try {
     const response = await fetch(`/api/auth/login`, {
-      credentials: "include",
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
