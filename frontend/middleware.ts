@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const API_BASE_URL = process.env.API_URL!;
+console.log("🔍 API_BASE_URL in middleware:", API_BASE_URL);
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
