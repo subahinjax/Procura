@@ -3,6 +3,10 @@ import type { NextRequest } from "next/server";
 
 const API_BASE_URL = "https://procura-backend-zf9w.onrender.com";
 
+console.log("🍪 Cookie received:", req.headers.get("cookie"));
+console.log("🔗 Pathname:", pathname);
+
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
