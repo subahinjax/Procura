@@ -7,6 +7,10 @@ import { useRef, useEffect } from "react";
 
 const PUBLIC_PATHS = ["/login", "/forgot", "/session-expired"];
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://procura-backend-zf9w.onrender.com";
+
+
 function ProtectedContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const pathname          = usePathname();
