@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
+const API_BASE_URL = process.env.API_URL!;
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
