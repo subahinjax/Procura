@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  // ✅ Just pass through — let each page/layout handle auth
   return NextResponse.next();
 }
 

@@ -7,10 +7,6 @@ import { useRef, useEffect } from "react";
 
 const PUBLIC_PATHS = ["/login", "/forgot", "/session-expired"];
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://procura-backend-zf9w.onrender.com";
-
-
 function ProtectedContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const pathname          = usePathname();
@@ -48,17 +44,6 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-
-
-useEffect(() => {
-  fetch(`${API_BASE_URL}/api/auth/me`, { credentials: "include" })
-    .then(res => {
-      if (!res.ok) window.location.href = "/login";
-    })
-    .catch(() => window.location.href = "/login");
-}, []);
-
-
 
 export default function RootLayout({
   children,

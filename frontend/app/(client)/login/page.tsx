@@ -76,6 +76,8 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     await new Promise(resolve => setTimeout(resolve, 300));
 
+    sessionStorage.setItem("app_was_logged_in", "true"); // ✅ match SESSION_KEY in AuthContext
+
     router.replace("/");
   } catch (error) {
     console.error("❌ Login error:", error);
