@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-
-
-// middleware.ts - temporary test only
 const API_BASE_URL = "https://procura-backend-zf9w.onrender.com";
-
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -31,21 +27,30 @@ export async function middleware(req: NextRequest) {
       cache: "no-store",
     });
 
+    // ✅ 401 = not logged in, redirect to login
+    if (response.status === 401) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+
+    // ✅ 403/500 = session issue, redirect to session-expired
+    if (response.status === 403 || response.status === 500) {
+      return NextResponse.redirect(new URL("/session-expired", req.url));
+    }
+
+    // ✅ Any other non-ok response
     if (!response.ok) {
       return NextResponse.redirect(new URL("/session-expired", req.url));
     }
+
   } catch (err) {
     return NextResponse.redirect(new URL("/session-expired", req.url));
   }
 
+  // ✅ Authenticated — proceed
   const res = NextResponse.next();
-
-  // ✅ Disable bfcache — forces fresh request on browser Back
   res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   res.headers.set("Pragma", "no-cache");
   res.headers.set("Expires", "0");
-  // ✅ removed Clear-Site-Data — only works on HTTPS
-
   return res;
 }
 
