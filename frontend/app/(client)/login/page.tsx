@@ -93,7 +93,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       <div className="w-2/3 min-h-screen flex justify-center">
         <div className="relative w-[95%] h-[96%] mt-3 rounded-3xl overflow-hidden shadow-xl">
           <Image
-            src="/images/Procura_FP.JPG"
+            src="/images/Procura_FP.jpg"
             alt="Login Image"
             fill
             priority
@@ -106,7 +106,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       <div className="w-1/3 bg-white mt-3 mb-4 mr-4 flex flex-col items-center justify-center px-6 rounded-3xl shadow-lg">
         <div className="text-center -mt-10 mb-6">
           <Image
-            src="/images/Procura_Logo.JPG"
+            src="/images/Procura_Logo.jpg"
             alt="Procura Logo"
             width={230}
             height={80}
