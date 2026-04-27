@@ -205,7 +205,7 @@ const showOnlyGrandTotal = !hasDiscount && !hasGST && !hasAdditions;
         {/* Bill To / Bank Details */}
         <div className="grid grid-cols-[40%_60%] border border-t-0 border-black">
           <div className="px-1 border-r border-black leading-[1]">
-            <p className="text-[16px] font-medium">Hindustan Institute of Technology & Science</p>
+            <p className="text-[16px] font-medium">Procura Soft</p>
             <p>No.1, Rajiv Gandhi Salai, OMR Road</p>
             <p>Padur, Kelambakkam</p>
             <p>Chennai 603 103</p>
@@ -486,7 +486,7 @@ const showOnlyGrandTotal = !hasDiscount && !hasGST && !hasAdditions;
             </div>
             {/* Right */}
             <div className="text-center font-semibold text-[15px] mt-0">
-              <p className="italic">For HINDUSTAN INSTITUTE OF TECHNOLOGY &amp; SCIENCE</p>
+              <p className="italic">For Procura Soft</p>
               <br /><br />
               <p className="text-center font-semibold text-[15px] leading-none mt-4">
                 {releaser?.name || approver?.name || "__________"}
