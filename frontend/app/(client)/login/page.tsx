@@ -88,6 +88,8 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 
   return (
+<div className="flex min-h-screen bg-gray-100">
+{/* Left Side - Image */}
 <div className="w-2/3 h-screen flex justify-center items-center">
   <div className="relative w-[95%] h-[95vh] rounded-3xl overflow-hidden shadow-xl bg-white">
     <Image
