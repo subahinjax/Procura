@@ -94,7 +94,7 @@ function FormModal({ cat, catTypes, onSave, onClose }: {
     setCodeLoading(true);
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/mas-cat/next-code?type=${encodeURIComponent(type)}`,
+        `/api/proxcy/mas-cat/next-code?type=${encodeURIComponent(type)}`,
         { credentials: "include" }
       );
       if (res.ok) {
@@ -134,7 +134,7 @@ function FormModal({ cat, catTypes, onSave, onClose }: {
     setAiLoading(true); setAiSuggestion(null);
     try {
       // Step 1: fetch active category list from our backend
-      const catRes = await fetch(`${API_BASE_URL}/api/mas-cat/suggest`, {
+      const catRes = await fetch(`/api/proxy/mas-cat/suggest`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         credentials: "include", body: JSON.stringify({ description: aiInput }),
       });
@@ -410,8 +410,8 @@ export default function CategoryMasterPage() {
     setLoading(true);
     try {
       const [cRes, tRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/mas-cat`,       { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/mas-cat/types`, { credentials: "include" }),
+        fetch(`/api/proxy/mas-cat`,       { credentials: "include" }),
+        fetch(`/api/proxy/mas-cat/types`, { credentials: "include" }),
       ]);
       if (cRes.status === 401) { router.replace("/session-expired"); return; }
       if (cRes.ok) setCats(await cRes.json());
@@ -421,7 +421,7 @@ export default function CategoryMasterPage() {
 
   // Save new category
   const handleAdd = async (data: Partial<Category>) => {
-    const res = await fetch(`${API_BASE_URL}/api/mas-cat`, {
+    const res = await fetch(`/proxy/api/mas-cat`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       credentials: "include", body: JSON.stringify(data),
     });
@@ -433,7 +433,7 @@ export default function CategoryMasterPage() {
   // Update category
   const handleEdit = async (data: Partial<Category>) => {
     if (!editCat) return;
-    const res = await fetch(`${API_BASE_URL}/api/mas-cat/${editCat.cat_code}`, {
+    const res = await fetch(`/api/proxy/mas-cat/${editCat.cat_code}`, {
       method: "PUT", headers: { "Content-Type": "application/json" },
       credentials: "include", body: JSON.stringify(data),
     });
@@ -444,14 +444,14 @@ export default function CategoryMasterPage() {
   // Delete
   const handleDelete = async (cat: Category) => {
     if (!window.confirm(`Delete category "${cat.category}" (${cat.cat_code})?`)) return;
-    const res = await fetch(`${API_BASE_URL}/api/mas-cat/${cat.cat_code}`, { method: "DELETE", credentials: "include" });
+    const res = await fetch(`/api/proxy/mas-cat/${cat.cat_code}`, { method: "DELETE", credentials: "include" });
     if (!res.ok) { alert((await res.json()).error || "Failed to delete"); return; }
     await loadAll();
   };
 
   // Toggle active
   const handleToggle = async (cat: Category) => {
-    const res = await fetch(`${API_BASE_URL}/api/mas-cat/${cat.cat_code}/toggle`, { method: "PATCH", credentials: "include" });
+    const res = await fetch(`/api/proxy/mas-cat/${cat.cat_code}/toggle`, { method: "PATCH", credentials: "include" });
     if (!res.ok) { alert("Failed to toggle status"); return; }
     await loadAll();
   };
