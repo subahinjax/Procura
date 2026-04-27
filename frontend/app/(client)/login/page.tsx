@@ -88,19 +88,17 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Left Side - Image */}
-      <div className="w-2/3 min-h-screen flex justify-center">
-        <div className="relative w-[95%] h-[96%] mt-3 rounded-3xl overflow-hidden shadow-xl">
-          <Image
-            src="/images/Procura_FP.jpg"
-            alt="Login Image"
-            fill
-            priority
-            className="object-contain md:object-cover"
-          />
-        </div>
-      </div>
+<div className="w-2/3 h-screen flex justify-center items-center">
+  <div className="relative w-[95%] h-[95vh] rounded-3xl overflow-hidden shadow-xl bg-white">
+    <Image
+      src="/images/Procura_FP.jpg"
+      alt="Login Image"
+      fill
+      priority
+      className="object-contain"
+    />
+  </div>
+</div>
 
       {/* Right Side - Login */}
       <div className="w-1/3 bg-white mt-3 mb-4 mr-4 flex flex-col items-center justify-center px-6 rounded-3xl shadow-lg">
@@ -117,7 +115,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <p>Chennai, Tamilnadu,</p>
           </div>
 	      <h2 className="text-xl font-semibold mt-16 bg-gradient-to-r from-blue-800 via-purple-800 to-pink-800 bg-clip-text text-transparent">
-	          Login
+	          Login to Procura
 	      </h2>
           </div>
 
