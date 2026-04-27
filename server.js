@@ -227,7 +227,7 @@ app.get("/api/items", async (req, res) => {
 
 app.get("/api/suppliers", async (req, res) => {
   try {
-    const result = await query("SELECT * FROM mas_sup");
+    const result = await query("SELECT * FROM mas_sup ORDER BY sup_name ASC");
     res.json(result);
   } catch (error) {
     console.error("❌ Error fetching suppliers:", error.message);
