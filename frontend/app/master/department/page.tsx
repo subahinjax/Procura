@@ -306,7 +306,7 @@ export default function DeptMasterPage() {
     try {
       const [dRes, sRes] = await Promise.all([
         fetch(`/api/proxy/department/all`),
-        fetch(`/api/proxy/subdepartment/all`),
+        fetch(`/api/proxy/subdepartments/all`),
       ]);
       if (dRes.status === 401 || sRes.status === 401) { router.replace("/session-expired"); return; }
       if (dRes.ok) setDepts(await dRes.json());
