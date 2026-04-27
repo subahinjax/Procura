@@ -93,7 +93,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       <div className="w-2/3 min-h-screen flex justify-center">
         <div className="relative w-[95%] h-[96%] mt-3 rounded-3xl overflow-hidden shadow-xl">
           <Image
-            src="/images/Library.JPG"
+            src="/images/Procura_FP.JPG"
             alt="Login Image"
             fill
             priority
@@ -106,19 +106,18 @@ const handleSubmit = async (e: React.FormEvent) => {
       <div className="w-1/3 bg-white mt-3 mb-4 mr-4 flex flex-col items-center justify-center px-6 rounded-3xl shadow-lg">
         <div className="text-center -mt-10 mb-6">
           <Image
-            src="/images/HITS_Logo.JPG"
-            alt="Hindustan Logo"
+            src="/images/Procura_Logo.JPG"
+            alt="Procura Logo"
             width={230}
             height={80}
             priority
             className="mx-auto mb-1"
           />
           <div className="text-xs text-gray-500 leading-snug mt-1 mb-2">
-            <p>1, Rajiv Gandhi Salai (OMR), Padur,</p>
-            <p>Kelambakkam, Chennai - 603 103</p>
+            <p>Chennai, Tamilnadu,</p>
           </div>
 	      <h2 className="text-xl font-semibold mt-16 bg-gradient-to-r from-blue-800 via-purple-800 to-pink-800 bg-clip-text text-transparent">
-	          Login to Procura HITS Pilot
+	          Login
 	      </h2>
           </div>
 
