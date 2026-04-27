@@ -97,7 +97,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       alt="Login Image"
       fill
       priority
-      className="object-contain"
+      className="object-cover object-center"
     />
   </div>
 </div>
