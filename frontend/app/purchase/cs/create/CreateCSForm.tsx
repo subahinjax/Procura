@@ -1106,7 +1106,7 @@ function SupplierCard({
           {suppliers.map(s=><option key={s.sup_id} value={String(s.sup_id)}>{s.sup_name}</option>)}
         </select>
 
-        <input type="text" placeholder={`Supplier name${isRequired?" *":""}`}
+        <input type="text" readOnly placeholder={`Supplier name${isRequired?" *":""}`}
           value={slot.sup_name} onChange={e=>onUpdate({sup_name:e.target.value})}
           className={`w-full h-8 border rounded px-2 text-sm focus:border-blue-500 focus:outline-none ${isRequired&&!slot.sup_name.trim()?"border-red-300":"border-gray-200"}`}/>
 

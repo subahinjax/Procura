@@ -305,8 +305,8 @@ export default function DeptMasterPage() {
     setLoading(true);
     try {
       const [dRes, sRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/department/all`,    { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/subdepartments/all`, { credentials: "include" }),
+        fetch(`/api/proxy/department/all`),
+        fetch(`/api/proxy/subdepartment/all`),
       ]);
       if (dRes.status === 401 || sRes.status === 401) { router.replace("/session-expired"); return; }
       if (dRes.ok) setDepts(await dRes.json());
@@ -328,7 +328,8 @@ export default function DeptMasterPage() {
     if (dept.subdept_count > 0)
       return alert(`Cannot delete "${dept.dept_name}" — it has ${dept.subdept_count} sub-department(s). Delete sub-departments first.`);
     if (!window.confirm(`Delete department "${dept.dept_name}" (ID: ${dept.dept_id})?`)) return;
-    const res = await fetch(`${API_BASE_URL}/api/department/${dept.dept_id}`, { method: "DELETE", credentials: "include" });
+    const res = await fetch(`/api/proxy/department/${dept.dept_id}`, { method: "DELETE", credentials: "include" });
+
     if (!res.ok) { alert((await res.json()).error || "Failed to delete"); return; }
     await loadAll();
   };
@@ -336,7 +337,7 @@ export default function DeptMasterPage() {
   // Delete subdept
   const deleteSubdept = async (sub: Subdept) => {
     if (!window.confirm(`Delete sub-department "${sub.subdept_name}"?`)) return;
-    const res = await fetch(`${API_BASE_URL}/api/subdepartment/${sub.subdept_id}`, { method: "DELETE", credentials: "include" });
+    const res = await fetch(`/api/proxy/subdepartment/${sub.subdept_id}`, { method: "DELETE", credentials: "include" });
     if (!res.ok) { alert((await res.json()).error || "Failed to delete"); return; }
     await loadAll();
   };
@@ -352,7 +353,7 @@ export default function DeptMasterPage() {
 
       // Step 1 — create dept if new
       if (data.mode === "new_dept") {
-        const res = await fetch(`${API_BASE_URL}/api/department`, {
+          const res = await fetch(`/api/proxy/department`, {
           method: "POST", headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ dept_name: data.dept_name, dept_range: data.dept_range }),
@@ -367,7 +368,7 @@ export default function DeptMasterPage() {
 
       // Step 2 — create each subdept
       for (const name of data.subdepts) {
-        const res = await fetch(`${API_BASE_URL}/api/subdepartment`, {
+        const res = await fetch(`/api/proxy/subdepartment`, {
           method: "POST", headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ dept_id, subdept_name: name }),
@@ -392,7 +393,7 @@ export default function DeptMasterPage() {
     try {
       // Update dept name if changed
       if (deptName !== editDept.dept_name) {
-        const res = await fetch(`${API_BASE_URL}/api/department/${editDept.dept_id}`, {
+        const res = await fetch(`/api/proxy/department/${editDept.dept_id}`, {
           method: "PUT", headers: { "Content-Type": "application/json" },
           credentials: "include", body: JSON.stringify({ dept_name: deptName }),
         });
@@ -400,7 +401,7 @@ export default function DeptMasterPage() {
       }
       // Update subdept if selected
       if (editSub) {
-        const res = await fetch(`${API_BASE_URL}/api/subdepartment/${editSub.subdept_id}`, {
+        const res = await fetch(`/api/proxy/subdepartment/${editSub.subdept_id}`, {
           method: "PUT", headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ dept_id: editDept.dept_id, subdept_name: editSub.subdept_name }),
