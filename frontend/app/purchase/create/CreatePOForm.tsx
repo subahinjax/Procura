@@ -259,7 +259,7 @@ const [grandTotal, setGrandTotal] = useState(0);
 
   const fetchterms = async () => {
     try {
-      const res  = await fetch("/api/terms");
+      const res  = await fetch("/api/proxy/terms");
       const data = await res.json();
 
       const normalized: Term[] = Array.isArray(data)
@@ -752,8 +752,8 @@ if (!item.unit || item.unit.trim() === "") {
 
       const url =
         mode === "edit"
-          ? `${API_BASE_URL}/api/purchase-orders/${poHeader.id}`
-          : `${API_BASE_URL}/api/po`;
+          ? `/api/proxy/purchase-orders/${poHeader.id}`
+          : `/api/proxy/po`;
 
       const res = await fetch(url, {
         method:      mode === "edit" ? "PUT" : "POST",
@@ -776,7 +776,7 @@ if (!item.unit || item.unit.trim() === "") {
         const formData = new FormData();
         Object.entries(pendingDocs).forEach(([key, file]) => formData.append(key, file));
         const docRes = await fetch(
-          `${API_BASE_URL}/api/purchase-orders/${data.poId}/documents`,
+          `/api/proxy/purchase-orders/${data.poId}/documents`,
           { method: "POST", body: formData, credentials: "include" }
         );
         if (!docRes.ok) {
