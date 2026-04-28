@@ -355,7 +355,7 @@ export default function CSReportPage() {
               lineHeight: `${sc(1.4, z)}`,
               marginBottom: `${sc(2, z)}px`,
             }}>
-              HINDUSTAN INSTITUTE OF TECHNOLOGY & SCIENCE
+              PROCURA SOFT
             </div>
 
             {/* CS No | Title | Date — original: 10pt / 13pt, marginBottom 12 */}
