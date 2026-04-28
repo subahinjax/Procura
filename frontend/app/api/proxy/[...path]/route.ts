@@ -22,22 +22,22 @@ async function handler(
   const isGet = req.method === "GET";
 
   // ✅ Build headers — don't override Content-Type for multipart
-  const headers: Record<string, string> = {
-    cookie: cookieHeader,
-  };
-  if (!isMultipart && !isGet) {
-    headers["Content-Type"] = "application/json";
-  }
+// ✅ Build headers
+const headers: Record<string, string> = {
+  cookie: cookieHeader,
+};
 
-  // ✅ Forward body correctly
-  let body: BodyInit | undefined = undefined;
-  if (!isGet) {
-    if (isMultipart) {
-      body = await req.blob(); // ✅ preserve binary file data
-    } else {
-      body = await req.text();
-    }
+// ✅ Forward body correctly
+let body: BodyInit | undefined = undefined;
+if (!isGet) {
+  if (isMultipart) {
+    body = await req.arrayBuffer(); // ✅ changed from blob()
+    headers["Content-Type"] = contentType; // ✅ includes boundary
+  } else {
+    headers["Content-Type"] = "application/json";
+    body = await req.text();
   }
+}
 
   const response = await fetch(url, {
     method: req.method,
