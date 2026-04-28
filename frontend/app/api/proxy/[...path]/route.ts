@@ -1,3 +1,4 @@
+// app/api/proxy/[...path]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
@@ -15,26 +16,53 @@ async function handler(
   const { path } = await params;
   const search = req.nextUrl.search || "";
   const url = `${API_URL}/api/${path.join("/")}${search}`;
+
+  const contentType = req.headers.get("content-type") || "";
+  const isMultipart = contentType.includes("multipart/form-data");
   const isGet = req.method === "GET";
+
+  // ✅ Build headers — don't override Content-Type for multipart
+  const headers: Record<string, string> = {
+    cookie: cookieHeader,
+  };
+  if (!isMultipart && !isGet) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  // ✅ Forward body correctly
+  let body: BodyInit | undefined = undefined;
+  if (!isGet) {
+    if (isMultipart) {
+      body = await req.blob(); // ✅ preserve binary file data
+    } else {
+      body = await req.text();
+    }
+  }
 
   const response = await fetch(url, {
     method: req.method,
-    headers: {
-      "Content-Type": "application/json",
-      cookie: cookieHeader,
-    },
-    body: isGet ? undefined : await req.text(),
+    headers,
+    body,
     cache: "no-store",
   });
 
-  const text = await response.text();
-  const res = new NextResponse(text, { status: response.status });
+  const resContentType = response.headers.get("content-type") || "";
+  const isJsonResponse = resContentType.includes("application/json");
 
+  const resBody = isJsonResponse
+    ? await response.json()
+    : await response.text();
+
+  const res = isJsonResponse
+    ? NextResponse.json(resBody, { status: response.status })
+    : new NextResponse(resBody, { 
+        status: response.status,
+        headers: { "Content-Type": resContentType }
+      });
+
+  // ✅ Forward set-cookie
   const setCookie = response.headers.get("set-cookie");
   if (setCookie) res.headers.set("set-cookie", setCookie);
-
-  const contentType = response.headers.get("content-type");
-  if (contentType) res.headers.set("Content-Type", contentType);
 
   return res;
 }
