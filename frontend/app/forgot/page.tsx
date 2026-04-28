@@ -14,7 +14,7 @@ export default function ForgotPasswordPage() {
     if (!email) return alert('Please enter your email');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/request-otp', {
+      const res = await fetch(`/api/proxy/request-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
     if (!otp) return alert('Please enter OTP');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/verify-otp', {
+      const res = await fetch(`/api/proxy/request-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp }),
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
     if (!newPassword) return alert('Please enter new password');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/reset-password', {
+      const res = await fetch(`/api/proxy/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp, newPassword }),
