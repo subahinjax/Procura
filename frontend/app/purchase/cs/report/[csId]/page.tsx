@@ -75,9 +75,9 @@ export default function CSReportPage() {
   useEffect(() => {
     if (!csId) return;
     Promise.all([
-      fetch(`${API_BASE_URL}/api/cs/${csId}`, { credentials:"include" })
+      fetch(`/api/proxy/cs/${csId}`, { credentials:"include" })
         .then(r => { if (!r.ok) throw new Error("Not found"); return r.json(); }),
-      fetch(`${API_BASE_URL}/api/cs/${csId}/approvers`, { credentials:"include" })
+      fetch(`/api/proxy/cs/${csId}/approvers`, { credentials:"include" })
         .then(r => r.ok ? r.json() : [])
         .catch(() => []),
     ]).then(([cs, appr]) => {
@@ -85,7 +85,7 @@ export default function CSReportPage() {
       if (Array.isArray(appr) && appr.length > 0) {
         setApprovers(appr);
       } else {
-        fetch(`${API_BASE_URL}/api/cs-approvers`, { credentials:"include" })
+        fetch(`/api/proxy/cs-approvers`, { credentials:"include" })
           .then(r => r.json()).then(d => setApprovers(Array.isArray(d) ? d : []));
       }
     }).catch(e => setError(e.message))

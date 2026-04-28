@@ -21,7 +21,7 @@ export default function CSDetailPage() {
   const fetchCS = useCallback(() => {
     if (!csId) return;
     setLoading(true);
-    fetch(`${API_BASE_URL}/api/cs/${csId}`, { credentials: "include" })
+    fetch(`/api/proxy/cs/${csId}`, { credentials: "include" })
       .then(r => { if (!r.ok) throw new Error("CS not found"); return r.json(); })
       .then(data => { setCsData(data); setLoading(false); })
       .catch(e  => { setError(e.message); setLoading(false); });
@@ -40,7 +40,7 @@ export default function CSDetailPage() {
   const handleFinalize = async () => {
     if (!confirm("Finalize this CS? It will be locked and cannot be edited.")) return;
     setFinalizing(true);
-    const res = await fetch(`${API_BASE_URL}/api/cs/${csId}/finalize`, {
+    const res = await fetch(`/api/proxy/cs/${csId}/finalize`, {
       method: "PATCH", credentials: "include",
     });
     if (res.ok) fetchCS();   // refetch to get Finalized status
