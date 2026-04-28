@@ -57,7 +57,7 @@ export default function ReleasedUploadPage() {
       formData.append("PO_RELEASED", file);
 
       const uploadRes = await fetch(
-        `${API_BASE_URL}/api/purchase-orders/${poId}/documents/release`,
+        `/api/proxy/purchase-orders/${poId}/documents/release`,
         {
           method: "POST",
           credentials: "include",
@@ -74,7 +74,7 @@ export default function ReleasedUploadPage() {
 
       // 2️⃣ Release PO
       const releaseRes = await fetch(
-        `${API_BASE_URL}/api/purchase-orders/${poId}/release`,
+        `/api/proxy/purchase-orders/${poId}/release`,
         {
           method: "PUT",
           credentials: "include",
