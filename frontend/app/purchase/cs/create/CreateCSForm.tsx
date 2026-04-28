@@ -144,7 +144,7 @@ export default function CreateCSForm({
       fetch(`${API_BASE_URL}/api/suppliers`,  { credentials: "include" }).then(r => r.json()),
       fetch(`${API_BASE_URL}/api/department`, { credentials: "include" }).then(r => r.json()),
       fetch(`${API_BASE_URL}/api/items`,      { credentials: "include" }).then(r => r.json()),
-      fetch(`${API_BASE_URL}/api/cs-approvers`,   { credentials: "include" }).then(r => r.json()),
+      fetch(`/api/proxy/cs-approvers`,   { credentials: "include" }).then(r => r.json()),
     ]).then(([sup, dept, itm, appr]) => {
       setSuppliers(  Array.isArray(sup)  ? sup  : []);
       setDepartments(Array.isArray(dept) ? dept : []);
@@ -203,7 +203,7 @@ export default function CreateCSForm({
     if (mode === "view" || h.status === "Finalized") setDisabled(true);
     // Load selected approvers for this CS
     if (existingCS?.header?.id) {
-      fetch(`${API_BASE_URL}/api/cs/${existingCS.header.id}/approvers`, { credentials: "include" })
+      fetch(`/api/proxy/cs/${existingCS.header.id}/approvers`, { credentials: "include" })
         .then(r => r.json())
         .then(d => { if (Array.isArray(d)) setSelectedApprIds(d.map((a: any) => a.id)); })
         .catch(() => {});
@@ -385,7 +385,7 @@ const selectMasItem = async (idx: number, code: number) => {
     try {
       const fd = new FormData();
       fd.append("file", file); fd.append("slot", String(uploadSlot));
-      const res  = await fetch(`${API_BASE_URL}/api/cs/parse-upload`, { method:"POST", body:fd, credentials:"include" });
+      const res  = await fetch(`/api/proxy/cs/parse-upload`, { method:"POST", body:fd, credentials:"include" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Parse failed");
       const rk = `sup${uploadSlot}_rate`; const gk = `sup${uploadSlot}_gst`;
@@ -471,7 +471,7 @@ return {
       // Save selected approvers
       const savedId = data.csId || existingCS?.header?.id;
       if (savedId && selectedApprIds.length > 0) {
-        await fetch(`${API_BASE_URL}/api/cs/${savedId}/approvers`, {
+        await fetch(`/api/proxy/cs/${savedId}/approvers`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
