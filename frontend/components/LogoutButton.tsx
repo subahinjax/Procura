@@ -10,7 +10,7 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/api/logout`, {
+      await fetch(`/api/proxy/logout`, {
         method: "POST",
         credentials: "include",
       });

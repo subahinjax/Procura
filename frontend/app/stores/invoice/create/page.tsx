@@ -579,7 +579,7 @@ useEffect(() => {
       };
 
       const res = await fetch(
-        isEdit ? `${API_BASE_URL}/api/invoice/${invoiceId}` : `${API_BASE_URL}/api/invoice`,
+        isEdit ? `/api/proxy/invoice/${invoiceId}` : `/api/proxy/invoice`,
         { method: isEdit ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify(payload) }
       );
       if (res.status === 401) { router.replace("/session-expired"); return; }

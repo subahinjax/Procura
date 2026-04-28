@@ -87,7 +87,7 @@ export default function IssuePage() {
       const params = new URLSearchParams();
       if (deptId)  params.set("dept_id", deptId);
       if (itemId)  params.set("item_id", itemId);
-      const url = `${API_BASE_URL}/api/issue${params.toString() ? "?" + params.toString() : ""}`;
+      const url = `/api/proxy/issue${params.toString() ? "?" + params.toString() : ""}`;
       const res = await fetch(url);
       if (res.status === 401) { router.replace("/session-expired"); return; }
       if (res.ok) setIssues(await res.json());
@@ -227,7 +227,7 @@ if (itemIds.length !== uniqueIds.size) {
         })),
       };
       const res = await fetch(
-        editId ? `${API_BASE_URL}/api/issue/${editId}` : `${API_BASE_URL}/api/issue`,
+        editId ? `/api/proxy/issue/${editId}` : `/api/proxy/issue`,
         { method: editId ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include", body: JSON.stringify(payload) }

@@ -226,7 +226,7 @@ const checkStockForRow = async (
 
   try {
     const res = await fetch(
-      `${API_BASE_URL}/api/stock/check-availability?dept_id=${deptId}&subdept_id=${subDeptId}&item_id=${itemId}&qty=${qty}`
+      `/api/proxy/stock/check-availability?dept_id=${deptId}&subdept_id=${subDeptId}&item_id=${itemId}&qty=${qty}`
     );
 
     if (!res.ok) return;
@@ -392,7 +392,7 @@ if (hasDuplicateItems()) {
           unit_of_measure: d.unit_of_measure || null, quantity: Number(d.quantity), remarks: null,
         })),
       };
-      const url    = editId ? `${API_BASE_URL}/api/nrgp/${editId}` : `${API_BASE_URL}/api/nrgp`;
+      const url    = editId ? `/api/proxy/nrgp/${editId}` : `/api/proxy/nrgp`;
       const method = editId ? "PUT" : "POST";
       const res = await fetch(url, {
         method, headers: { "Content-Type": "application/json" },

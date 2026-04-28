@@ -152,31 +152,31 @@ useEffect(() => {
 
 
   const fetchSuppliers = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/suppliers`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/suppliers`, { credentials: "include" });
     if (res.ok) setSuppliers(await res.json());
   };
 
   const fetchInvoiceNumber = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/invoice/new-number`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/invoice/new-number`, { credentials: "include" });
     if (res.ok) setInvoiceNumber((await res.json()).invoice_number);
   };
 
   const fetchGrnsForSupplier = async (supId: number) => {
-    const res = await fetch(`${API_BASE_URL}/api/invoice/grns-by-supplier/${supId}`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/invoice/grns-by-supplier/${supId}`, { credentials: "include" });
     if (res.ok) setAvailableGrns(await res.json());
   };
 
   const fetchChargeItems = async () => {
     const [chargeRes, itemRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/invoice/charge-items`, { credentials: "include" }),
-      fetch(`${API_BASE_URL}/api/items`, { credentials: "include" }),
+      fetch(`/api/proxy/invoice/charge-items`, { credentials: "include" }),
+      fetch(`/api/proxy/items`, { credentials: "include" }),
     ]);
     if (chargeRes.ok) setChargeItems(await chargeRes.json());
     if (itemRes.ok)   setMasItems(await itemRes.json());
   };
 
   const fetchInvoice = async (id: string) => {
-    const res = await fetch(`${API_BASE_URL}/api/invoice/${id}`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/invoice/${id}`, { credentials: "include" });
     if (res.status === 401) { router.replace("/session-expired"); return; }
     if (!res.ok) { router.replace("/stores/invoice"); return; }
     const data = await res.json();
@@ -241,7 +241,7 @@ useEffect(() => {
     if (h.grn_ids?.length) {
       const grnData = await Promise.all(
         h.grn_ids.map((gid: number) =>
-          fetch(`${API_BASE_URL}/api/grn/${gid}`, { credentials: "include" })
+          fetch(`/api/proxy/grn/${gid}`, { credentials: "include" })
             .then(r => r.ok ? r.json() : null)
         )
       );
@@ -281,7 +281,7 @@ useEffect(() => {
       const valStr = String(val);
       if (selectedGrns.find(g => String(g.id) === valStr)) return;
 
-      const res = await fetch(`${API_BASE_URL}/api/invoice/grn-balance/${valStr}`, { credentials: "include" });
+      const res = await fetch(`/api/proxy/invoice/grn-balance/${valStr}`, { credentials: "include" });
       if (!res.ok) { alert("Failed to load GRN items"); return; }
       const balanceItems: any[] = await res.json();
 
@@ -306,7 +306,7 @@ useEffect(() => {
       const activePo = po_id || grnInfo.po_id;
       let poItems: any[] = [];
       if (activePo) {
-        const poRes = await fetch(`${API_BASE_URL}/api/invoice/po-rates/${activePo}`, { credentials: "include" });
+        const poRes = await fetch(`/api/proxy/invoice/po-rates/${activePo}`, { credentials: "include" });
         if (poRes.ok) {
           const poData = await poRes.json();
           poItems = poData.items || [];
@@ -430,7 +430,7 @@ useEffect(() => {
   };
 
   const applyPoRates = async (poId: number | string) => {
-    const res = await fetch(`${API_BASE_URL}/api/invoice/po-rates/${poId}`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/invoice/po-rates/${poId}`, { credentials: "include" });
     if (!res.ok) return;
     const data = await res.json();
     const poItems: any[] = data.items || [];
@@ -580,7 +580,7 @@ useEffect(() => {
       };
 
       const res = await fetch(
-        isEdit ? `${API_BASE_URL}/api/invoice/${invoiceId}` : `${API_BASE_URL}/api/invoice`,
+        isEdit ? `/api/proxy/invoice/${invoiceId}` : `/api/proxy/invoice`,
         { method: isEdit ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify(payload) }
       );
       if (res.status === 401) { router.replace("/session-expired"); return; }
