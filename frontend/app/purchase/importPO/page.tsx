@@ -33,7 +33,7 @@ export default function ImportPOPage() {
     const fetchPOs = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/api/purchase-orders`, {
+        const res = await fetch(`/api/proxy/purchase-orders`, {
           credentials: "include",
         });
 

@@ -26,7 +26,7 @@ export default function InvoiceListPage() {
 
   const fetchInvoices = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/invoice`, { credentials: "include" });
+      const res = await fetch(`/api/proxy/invoice`);
       if (res.status === 401) { router.replace("/session-expired"); return; }
       if (!res.ok) throw new Error("Failed to fetch invoices");
       setInvoices(await res.json());
@@ -40,7 +40,7 @@ export default function InvoiceListPage() {
   const openView = async (id: number) => {
     setViewLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/invoice/${id}`, { credentials: "include" });
+      const res = await fetch(`/api/proxy/invoice/${id}`);
       if (!res.ok) return;
       const data = await res.json();
       setViewInv(data.header);
@@ -52,7 +52,7 @@ export default function InvoiceListPage() {
   const handleDelete = async (id: number, invoice_number: string) => {
     if (!window.confirm(`Delete Invoice ${invoice_number}?`)) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/invoice/${id}`, {
+      const res = await fetch(`/api/proxy/invoice/${id}`, {
         method: "DELETE", credentials: "include",
       });
       if (res.status === 401) { router.replace("/session-expired"); return; }

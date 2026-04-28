@@ -14,12 +14,12 @@ export default function CSApproversPage() {
   const load = () => {
     setLoading(true);
     // fetch ALL approvers (including inactive) for the master page
-    fetch(`/api/proxy/cs-approvers/all`, { credentials: "include" })
+    fetch(`/api/proxy/cs-approvers/all`)
       .then(r => r.json())
       .then(d => setList(Array.isArray(d) ? d : []))
       .catch(() => {
         // fallback to active-only if /all not implemented yet
-        fetch(`/api/proxy/cs-approvers`, { credentials: "include" })
+        fetch(`/api/proxy/cs-approvers`)
           .then(r => r.json()).then(d => setList(Array.isArray(d) ? d : []));
       })
       .finally(() => setLoading(false));

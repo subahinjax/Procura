@@ -101,16 +101,16 @@ export default function GRNFormPage() {
   const fetchDropdowns = async () => {
     try {
       const [supRes, itemRes, deptRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/suppliers`, { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/items`, { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/department`, { credentials: "include" }),
+        fetch(`/api/proxy/suppliers`),
+        fetch(`/api/proxy/items`),
+        fetch(`/api/proxy/department`),
       ]);
       if (supRes.ok) setSuppliers(await supRes.json());
       if (itemRes.ok) setItems(await itemRes.json());
       if (deptRes.ok) setDepartments(await deptRes.json());
 
       // Fetch all subdepts at once — then immediately apply filtered subdepts if dept already set
-      const subdeptRes = await fetch(`${API_BASE_URL}/api/subdepartments/all`, { credentials: "include" });
+      const subdeptRes = await fetch(`/api/proxy/subdepartments/all`);
       if (subdeptRes.ok) {
         const allSubs: any[] = await subdeptRes.json();
         setAllSubdepts(allSubs);
@@ -136,8 +136,7 @@ export default function GRNFormPage() {
     if (!supId) { setPos([]); return; }
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/purchase-orders?supplier_id=${supId}&exclude_complete=true`,
-        { credentials: "include" }
+        `${API_BASE_URL}/api/purchase-orders?supplier_id=${supId}&exclude_complete=true`
       );
       if (res.ok) setPos(await res.json());
     } catch (err) {
@@ -147,7 +146,7 @@ export default function GRNFormPage() {
 
   const fetchGRNNumber = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/grn/new-number`, { credentials: "include" });
+      const res = await fetch(`/api/proxy/grn/new-number`);
       if (res.ok) {
         const data = await res.json();
         setGrnNumber(data.grn_number);
@@ -159,7 +158,7 @@ export default function GRNFormPage() {
 
   const fetchGRN = async (id: string) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/grn/${id}`, { credentials: "include" });
+      const res = await fetch(`/api/proxy/grn/${id}`);
       if (res.status === 401) { router.replace("/session-expired"); return; }
       if (!res.ok) { router.replace("/stores/grn"); return; }
       const data = await res.json();
@@ -210,12 +209,12 @@ setDetails(
     }
     try {
       // Fetch PO balance (remaining qty to receive)
-      const balRes = await fetch(`${API_BASE_URL}/api/grn/po-balance/${selectedPoId}`, { credentials: "include" });
+      const balRes = await fetch(`/api/proxy/grn/po-balance/${selectedPoId}`);
       if (!balRes.ok) return;
       const balItems: any[] = await balRes.json();
 
       // Also fetch PO header for dept/subdept
-      const poRes = await fetch(`${API_BASE_URL}/api/purchase-orders/${selectedPoId}`, { credentials: "include" });
+      const poRes = await fetch(`/api/proxy/purchase-orders/${selectedPoId}`);
       const poData = poRes.ok ? await poRes.json() : null;
 if (balItems.length > 0) {
 setDetails(

@@ -25,7 +25,7 @@ export default function TermsConditionsTable({
  // Fetch terms from API
 const fetchTerms = () => {
   console.log("🚀 Fetching terms from API...");
-  fetch(`${API_BASE_URL}/api/terms`, { credentials: "include" })
+  fetch(`/api/proxy/terms`)
     .then(res => res.json())
     .then(data => {
 

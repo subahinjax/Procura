@@ -24,7 +24,7 @@ export default function ModifyPOPage() {
   const fetchPOs = async () => {
     try {
       setPageLoading(true);
-      const res = await fetch(`${API_BASE_URL}/api/purchase-orders`, {
+      const res = await fetch(`/api/proxy/purchase-orders`, {
         credentials: "include",
       });
       if (res.status === 401) {
@@ -132,7 +132,7 @@ export default function ModifyPOPage() {
                         onClick={async () => {
                           if (!window.confirm("Do you really want to cancel this PO?")) return;
                           try {
-                            const res = await fetch(`${API_BASE_URL}/api/purchase-orders/${po.id}/cancel`,
+                            const res = await fetch(`/api/proxy/purchase-orders/${po.id}/cancel`,
                               { method: "PUT", credentials: "include" });
                             const data = await res.json();
                             if (!res.ok) throw new Error(data.message || "Cancel failed");

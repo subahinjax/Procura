@@ -40,7 +40,7 @@ export default function PurchasePage() {
 
     setDashboardLoading(true);
 
-    fetch(`/api/dashboard/purchase`, { credentials: "include" })
+    fetch(`/api/dashboard/purchase`)
       .then(res => {
         if (res.status === 401) {
           // ✅ FIX 5: redirect to session-expired not login

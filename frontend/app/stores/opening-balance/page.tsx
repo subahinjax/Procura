@@ -55,11 +55,11 @@ export default function OpeningBalancePage() {
       if (subdeptId) params.set("subdept_id", subdeptId);
       if (itemId)    params.set("item_id", itemId);
       const [itemRes, deptRes, subdeptRes, obRes, obAllRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/items`, { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/department`, { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/subdepartments/all`, { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/stock/opening-balance${params.toString() ? "?" + params : ""}`, { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/stock/opening-balance`, { credentials: "include" }),
+        fetch(`/api/proxy/items`),
+        fetch(`/api/proxy/department`),
+        fetch(`/api/proxy/subdepartments/all`),
+        fetch(`/api/proxy/stock/opening-balance${params.toString() ? "?" + params : ""}`),
+        fetch(`/api/proxy/stock/opening-balance`),
       ]);
       if (itemRes.ok)    setItems(await itemRes.json());
       if (deptRes.ok)    setDepts(await deptRes.json());
@@ -79,8 +79,8 @@ export default function OpeningBalancePage() {
     if (subdeptId) params.set("subdept_id", subdeptId);
     if (itemId)    params.set("item_id", itemId);
     const [obRes, obAllRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/stock/opening-balance${params.toString() ? "?" + params : ""}`, { credentials: "include" }),
-      fetch(`${API_BASE_URL}/api/stock/opening-balance`, { credentials: "include" }),
+      fetch(`/api/proxy/stock/opening-balance${params.toString() ? "?" + params : ""}`),
+      fetch(`/api/proxy/stock/opening-balance`),
     ]);
     if (obRes.ok)    setExisting(await obRes.json());
     if (obAllRes.ok) setAllExisting(await obAllRes.json());
@@ -169,7 +169,7 @@ export default function OpeningBalancePage() {
     }
     setSaving(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/stock/opening-balance`, {
+      const res = await fetch(`/api/proxy/stock/opening-balance`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -210,7 +210,7 @@ export default function OpeningBalancePage() {
       return alert("Opening qty must be 0 or greater");
     if (!window.confirm("Update this opening balance?")) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/stock/opening-balance/${editingId}`, {
+      const res = await fetch(`/api/proxy/stock/opening-balance/${editingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -233,7 +233,7 @@ export default function OpeningBalancePage() {
 
   const handleDelete = async (id: number, item_name: string) => {
     if (!window.confirm(`Delete opening balance for "${item_name}"?`)) return;
-    const res = await fetch(`${API_BASE_URL}/api/stock/opening-balance/${id}`, {
+    const res = await fetch(`/api/proxy/stock/opening-balance/${id}`, {
       method: "DELETE", credentials: "include",
     });
     if (!res.ok) { alert("Failed to delete"); return; }

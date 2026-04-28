@@ -100,7 +100,7 @@ const PurchaseOrderReport: React.FC<Props> = ({ poData }) => {
   };
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/approvers`, { credentials: "include" })
+    fetch(`/api/proxy/approvers`)
       .then(res => res.json())
       .then(setApprovers);
   }, []);

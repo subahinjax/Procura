@@ -223,12 +223,12 @@ const [grandTotal, setGrandTotal] = useState(0);
   const fetchMasterData = async () => {
     try {
       const [supRes, deptRes, itemRes, apprRes, ocRes, csRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/suppliers`,            { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/department`,           { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/items`,                { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/approvers`,            { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/invoice/charge-items`, { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/cs`,                   { credentials: "include" }),
+        fetch(`/api/proxy/suppliers`),
+        fetch(`/api/proxy/department`),
+        fetch(`/api/proxy/items`),
+        fetch(`/api/proxy/approvers`),
+        fetch(`/api/proxy/invoice/charge-items`),
+        fetch(`/api/proxy/cs`),
       ]);
       const suppliersData   = await supRes.json();
       const departmentData  = await deptRes.json();
@@ -359,7 +359,7 @@ const [grandTotal, setGrandTotal] = useState(0);
     setPoHeader((prev) => ({ ...prev, dept_id: dept?.dept_id || "" }));
 
     if (dept) {
-      fetch(`${API_BASE_URL}/api/subdepartment/${dept.dept_id}`)
+      fetch(`/api/proxy/subdepartment/${dept.dept_id}`)
         .then(res => res.json())
         .then((subs: SubDepartment[]) => {
           setSubDepartments(subs);
@@ -412,7 +412,7 @@ const handleCsSelect = async (csId: string) => {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/api/cs/${csId}`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/cs/${csId}`);
     if (!res.ok) { alert("Failed to load CS"); return; }
     const { header: ch, items: ciRows } = await res.json();
 
@@ -429,7 +429,7 @@ const handleCsSelect = async (csId: string) => {
 
     let matchedSub: SubDepartment | null = null;
     if (matchedDept) {
-      const subRes = await fetch(`${API_BASE_URL}/api/subdepartment/${matchedDept.dept_id}`, { credentials: "include" });
+      const subRes = await fetch(`/api/proxy/subdepartment/${matchedDept.dept_id}`);
       const subs   = subRes.ok ? await subRes.json() : [];
       setSubDepartments(subs);
       matchedSub = subs.find((s: SubDepartment) => String(s.subdept_id) === String(ch.subdept_id)) || null;
@@ -508,7 +508,7 @@ const handleCsSelect = async (csId: string) => {
   // ---------------- Fetch subdepartments on department change ----------------
   useEffect(() => {
     if (!selectedDepartment) return setSubDepartments([]);
-    fetch(`${API_BASE_URL}/api/subdepartment/${selectedDepartment.dept_id}`)
+    fetch(`/api/proxy/subdepartment/${selectedDepartment.dept_id}`)
       .then(res => res.json())
       .then(data => setSubDepartments(data))
       .catch(err => console.error("Error fetching subdepartments:", err));
@@ -797,7 +797,7 @@ if (!item.unit || item.unit.trim() === "") {
 
       // Link CS to saved PO so it won't appear in dropdown again
       if (selectedCsId) {
-        await fetch(`${API_BASE_URL}/api/cs/${selectedCsId}/link-po`, {
+        await fetch(`/api/proxy/cs/${selectedCsId}/link-po`, {
           method:      "PATCH",
           headers:     { "Content-Type": "application/json" },
           body:        JSON.stringify({ po_id: data.poId }),

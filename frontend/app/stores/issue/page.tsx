@@ -66,10 +66,10 @@ export default function IssuePage() {
 
   const fetchDropdowns = async () => {
     const [deptRes, subRes, itemRes, allItemRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/department`, { credentials: "include" }),
-      fetch(`${API_BASE_URL}/api/subdepartments/all`, { credentials: "include" }),
-      fetch(`${API_BASE_URL}/api/stock/items-for-issue`, { credentials: "include" }),
-      fetch(`${API_BASE_URL}/api/stock/items-for-issue?all=true`, { credentials: "include" }),
+      fetch(`/api/proxy/department`),
+      fetch(`/api/proxy/subdepartments/all`),
+      fetch(`/api/proxy/stock/items-for-issue`),
+      fetch(`/api/proxy/stock/items-for-issue?all=true`),
     ]);
     if (deptRes.ok)    setDepts(await deptRes.json());
     if (subRes.ok)     setAllSubdepts(await subRes.json());
@@ -88,14 +88,14 @@ export default function IssuePage() {
       if (deptId)  params.set("dept_id", deptId);
       if (itemId)  params.set("item_id", itemId);
       const url = `${API_BASE_URL}/api/issue${params.toString() ? "?" + params.toString() : ""}`;
-      const res = await fetch(url, { credentials: "include" });
+      const res = await fetch(url);
       if (res.status === 401) { router.replace("/session-expired"); return; }
       if (res.ok) setIssues(await res.json());
     } finally { setListLoading(false); }
   };
 
   const fetchIssueNumber = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/issue/new-number`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/issue/new-number`);
     if (res.ok) setIssueNumber((await res.json()).issue_number);
   };
 
@@ -106,7 +106,7 @@ export default function IssuePage() {
   };
 
   const openEditForm = async (id: number) => {
-    const res = await fetch(`${API_BASE_URL}/api/issue/${id}`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/issue/${id}`);
     if (!res.ok) return;
     const data = await res.json();
     const h = data.header;
@@ -238,9 +238,9 @@ if (itemIds.length !== uniqueIds.size) {
       resetForm();
       // Refresh items + issue number + list
       const [numRes, itemRes, allItemRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/issue/new-number`, { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/stock/items-for-issue`, { credentials: "include" }),
-        fetch(`${API_BASE_URL}/api/stock/items-for-issue?all=true`, { credentials: "include" }),
+        fetch(`/api/proxy/issue/new-number`),
+        fetch(`/api/proxy/stock/items-for-issue`),
+        fetch(`/api/proxy/stock/items-for-issue?all=true`),
       ]);
       if (numRes.ok)    setIssueNumber((await numRes.json()).issue_number);
       if (itemRes.ok)   setStoreItems(await itemRes.json());
@@ -256,14 +256,14 @@ if (itemIds.length !== uniqueIds.size) {
 
   const handleDelete = async (id: number, num: string) => {
     if (!window.confirm(`Delete Issue ${num}?`)) return;
-    const res = await fetch(`${API_BASE_URL}/api/issue/${id}`, { method: "DELETE", credentials: "include" });
+    const res = await fetch(`/api/proxy/issue/${id}`, { method: "DELETE", credentials: "include" });
     if (res.status === 401) { router.replace("/session-expired"); return; }
     if (!res.ok) { alert("Failed to delete"); return; }
     alert("Deleted successfully");
     // Refresh list + stock items together so nil-stock items update immediately
     const [itemRes, allItemRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/stock/items-for-issue`, { credentials: "include" }),
-      fetch(`${API_BASE_URL}/api/stock/items-for-issue?all=true`, { credentials: "include" }),
+      fetch(`/api/proxy/stock/items-for-issue`),
+      fetch(`/api/proxy/stock/items-for-issue?all=true`),
     ]);
     if (itemRes.ok)    setStoreItems(await itemRes.json());
     if (allItemRes.ok) {

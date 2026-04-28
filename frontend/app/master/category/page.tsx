@@ -94,8 +94,7 @@ function FormModal({ cat, catTypes, onSave, onClose }: {
     setCodeLoading(true);
     try {
       const res = await fetch(
-        `/api/proxcy/mas-cat/next-code?type=${encodeURIComponent(type)}`,
-        { credentials: "include" }
+        `/api/proxcy/mas-cat/next-code?type=${encodeURIComponent(type)}`
       );
       if (res.ok) {
         const data = await res.json();
@@ -410,8 +409,8 @@ export default function CategoryMasterPage() {
     setLoading(true);
     try {
       const [cRes, tRes] = await Promise.all([
-        fetch(`/api/proxy/mas-cat`,       { credentials: "include" }),
-        fetch(`/api/proxy/mas-cat/types`, { credentials: "include" }),
+        fetch(`/api/proxy/mas-cat`),
+        fetch(`/api/proxy/mas-cat/types`),
       ]);
       if (cRes.status === 401) { router.replace("/session-expired"); return; }
       if (cRes.ok) setCats(await cRes.json());

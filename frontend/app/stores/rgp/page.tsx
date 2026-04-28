@@ -180,9 +180,9 @@ export default function RGPPage() {
 
   const fetchDropdowns = async () => {
     const [dRes, subRes, itemRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/department`, { credentials: "include" }),
-      fetch(`${API_BASE_URL}/api/subdepartments/all`, { credentials: "include" }),
-      fetch(`${API_BASE_URL}/api/items`, { credentials: "include" }),
+      fetch(`/api/proxy/department`),
+      fetch(`/api/proxy/subdepartments/all`),
+      fetch(`/api/proxy/items`),
     ]);
     if (dRes.ok)    setDepts(await dRes.json());
     if (subRes.ok)  setAllSubdepts(await subRes.json());
@@ -196,14 +196,14 @@ export default function RGPPage() {
       if (approval) p.set("approval_status", approval);
       if (ret)      p.set("return_status", ret);
       const qs = p.toString() ? "?" + p.toString() : "";
-      const res = await fetch(`${API_BASE_URL}/api/rgp${qs}`, { credentials: "include" });
+      const res = await fetch(`/api/proxy/rgp${qs}`);
       if (res.status === 401) { router.replace("/session-expired"); return; }
       if (res.ok) setList(await res.json());
     } finally { setListLoading(false); }
   };
 
   const fetchNumber = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/rgp/new-number`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/rgp/new-number`);
     if (res.ok) setRgpNumber((await res.json()).rgp_number);
   };
 
@@ -229,8 +229,7 @@ const checkStockForRow = async (
 
   try {
     const res = await fetch(
-      `${API_BASE_URL}/api/stock/check-availability?dept_id=${deptId}&subdept_id=${subdeptId}&item_id=${itemId}&qty=${qty}`,
-      { credentials: "include" }
+      `${API_BASE_URL}/api/stock/check-availability?dept_id=${deptId}&subdept_id=${subdeptId}&item_id=${itemId}&qty=${qty}`
     );
 
     if (!res.ok) return;
@@ -333,7 +332,7 @@ const handleSubDeptChange = (newSubDeptId: number | "") => {
 
 
   const openEdit = async (id: number) => {
-    const res = await fetch(`${API_BASE_URL}/api/rgp/${id}`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/rgp/${id}`);
     if (!res.ok) { alert("Failed to load gate pass"); return; }
     const data = await res.json();
     const h = data.header;
@@ -422,14 +421,14 @@ if (hasDuplicateItems()) {
   const handleDelete = async (id: number, num: string) => {
     if (!isAdmin) { alert("Only Admin can delete gate passes"); return; }
     if (!window.confirm(`Delete Gate Pass ${num}?`)) return;
-    const res = await fetch(`${API_BASE_URL}/api/rgp/${id}`, { method: "DELETE", credentials: "include" });
+    const res = await fetch(`/api/proxy/rgp/${id}`, { method: "DELETE", credentials: "include" });
     if (!res.ok) { alert((await res.json()).error || "Failed to delete"); return; }
     fetchList(filterApproval || undefined, filterReturn || undefined);
   };
 
   const handleSubmit = async (id: number) => {
     if (!window.confirm("Submit for HOD Approval?")) return;
-    const res = await fetch(`${API_BASE_URL}/api/rgp/${id}/submit`, { method: "POST", credentials: "include" });
+    const res = await fetch(`/api/proxy/rgp/${id}/submit`, { method: "POST", credentials: "include" });
     if (!res.ok) { alert((await res.json()).error || "Failed"); return; }
     alert("Submitted for HOD Approval");
     fetchList(filterApproval || undefined, filterReturn || undefined);
@@ -437,7 +436,7 @@ if (hasDuplicateItems()) {
 
   const handleApprovalAction = async (remarksVal: string) => {
     if (!approvalModal) return;
-    const res = await fetch(`${API_BASE_URL}/api/rgp/${approvalModal.id}/${approvalModal.action}`, {
+    const res = await fetch(`/api/proxy/rgp/${approvalModal.id}/${approvalModal.action}`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       credentials: "include", body: JSON.stringify({ remarks: remarksVal }),
     });
@@ -470,7 +469,7 @@ if (hasDuplicateItems()) {
     if (!window.confirm("Record this return?")) return;
     setReturnSaving(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/rgp-return`, {
+      const res = await fetch(`/api/proxy/rgp-return`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({

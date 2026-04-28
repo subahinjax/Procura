@@ -43,8 +43,7 @@ export default function CreatePOClient() {
         setPageLoading(true);
 
         const res = await fetch(
-          `${API_BASE_URL}/api/purchase-orders/${poId}`,
-          { credentials: "include" }
+          `${API_BASE_URL}/api/purchase-orders/${poId}`
         );
 
         if (res.status === 401) {

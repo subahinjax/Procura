@@ -17,7 +17,7 @@ export default function CSListPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/cslist`, { credentials: "include" });
+      const res = await fetch(`/api/proxy/cslist`);
       if (res.ok) setList(await res.json());
     } finally { setLoading(false); }
   };
@@ -28,7 +28,7 @@ export default function CSListPage() {
     if (!confirm(`Delete ${csNo}? This cannot be undone.`)) return;
     setDeleting(id);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/cs/${id}`, {
+      const res = await fetch(`/api/proxy/cs/${id}`, {
         method: "DELETE", credentials: "include",
       });
       if (res.ok) setList(prev => prev.filter(r => r.id !== id));
@@ -38,7 +38,7 @@ export default function CSListPage() {
 
   const handleFinalize = async (id: number) => {
     if (!confirm("Finalize this CS? It will be locked and cannot be edited.")) return;
-    const res = await fetch(`${API_BASE_URL}/api/cs/${id}/finalize`, {
+    const res = await fetch(`/api/proxy/cs/${id}/finalize`, {
       method: "PATCH", credentials: "include",
     });
     if (res.ok) load();

@@ -44,32 +44,32 @@ useEffect(() => {
 }, [authLoading, user, pathname]);
 
   const fetchDepts = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/department`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/department`);
     if (res.ok) setDepts(await res.json());
   };
 
   // Replace fetchSubDepts to use existing endpoint
 const fetchSubDepts = async (deptId?: string) => {
   const qs = deptId ? `?dept_id=${deptId}` : "";
-  const res = await fetch(`${API_BASE_URL}/api/subdepartments/all${qs}`, { credentials: "include" });
+  const res = await fetch(`/api/proxy/subdepartments/all${qs}`);
   if (res.ok) setSubDepts(await res.json());
   else setSubDepts([]);
 };
 
 
   const fetchAllItems = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/stock/all-item-names`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/stock/all-item-names`);
     if (res.ok) setAllItems(await res.json());
   };
 
   const fetchCategoryTypes = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/stock/category-types`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/stock/category-types`);
     if (res.ok) setCategoryTypes(await res.json());
   };
 
   const fetchCategories = async (catType?: string) => {
     const qs = catType ? `?category_type=${encodeURIComponent(catType)}` : "";
-    const res = await fetch(`${API_BASE_URL}/api/stock/categories${qs}`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/stock/categories${qs}`);
     if (res.ok) setCategories(await res.json());
   };
 
@@ -92,7 +92,7 @@ const fetchSubDepts = async (deptId?: string) => {
     if (catType) p.set("category_type", catType);
     if (catCode) p.set("cat_code", catCode);
     const qs  = p.toString() ? "?" + p.toString() : "";
-    const res = await fetch(`${API_BASE_URL}/api/stock/balance${qs}`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/stock/balance${qs}`);
     if (res.ok) setBalance(await res.json());
   } finally { setLoading(false); }
 };

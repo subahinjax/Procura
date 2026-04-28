@@ -54,7 +54,7 @@ export default function SettingsPage() {
   const loadBackups = useCallback(async () => {
     setLoadingList(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/backup`, { credentials: "include" });
+      const res = await fetch(`/api/proxy/backup`);
       if (res.ok) { const d = await res.json(); setBackups(d.backups || []); }
     } catch { /* ignore */ }
     finally { setLoadingList(false); }
@@ -69,7 +69,7 @@ export default function SettingsPage() {
     setBackupStatus("running");
     setBackupMessage("");
     try {
-      const res  = await fetch(`${API_BASE_URL}/api/backup`, { method: "POST", credentials: "include" });
+      const res  = await fetch(`/api/proxy/backup`, { method: "POST", credentials: "include" });
       const data = await res.json();
       if (res.ok && data.success) {
         setBackupStatus("success");
@@ -99,7 +99,7 @@ export default function SettingsPage() {
     if (!confirm(`Delete backup:\n"${fileName}"?\n\nThis cannot be undone.`)) return;
     setDeletingFile(fileName);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/backup`, {
+      const res = await fetch(`/api/proxy/backup`, {
         method: "DELETE", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileName }),

@@ -27,7 +27,7 @@ export default function GRNListPage() {
 
   const fetchGRNs = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/grn`, { credentials: "include" });
+      const res = await fetch(`/api/proxy/grn`);
       if (res.status === 401) { router.replace("/session-expired"); return; }
       if (!res.ok) throw new Error("Failed to fetch GRNs");
       const data = await res.json();
@@ -45,7 +45,7 @@ const handleView = async (grn: any) => {
   setViewDetails([]);
   setModalLoading(true);
   try {
-    const res = await fetch(`${API_BASE_URL}/api/grn/${grn.id}`, { credentials: "include" });
+    const res = await fetch(`/api/proxy/grn/${grn.id}`);
     if (res.status === 401) { router.replace("/session-expired"); return; }
     if (!res.ok) throw new Error("Failed to fetch GRN details");
     const data = await res.json();
@@ -62,7 +62,7 @@ const handleView = async (grn: any) => {
   const handleDelete = async (id: number, grn_number: string) => {
     if (!window.confirm(`Delete GRN ${grn_number}?`)) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/grn/${id}`, {
+      const res = await fetch(`/api/proxy/grn/${id}`, {
         method: "DELETE", credentials: "include",
       });
       if (res.status === 401) { router.replace("/session-expired"); return; }
