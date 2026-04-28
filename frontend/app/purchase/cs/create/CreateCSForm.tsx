@@ -225,7 +225,7 @@ export default function CreateCSForm({
 
 const fetchMasItems = async () => {
   try {
-    const res = await fetch("/api/items");
+    const res = await fetch(`/api/proxy/items`);
     const data = await res.json();
     setMasItems(data || []);
   } catch (err) {
@@ -463,7 +463,7 @@ return {
 
       const isEdit = mode==="edit" && existingCS?.header?.id;
       const res = await fetch(
-        isEdit ? `${API_BASE_URL}/api/cs/${existingCS.header.id}` : `${API_BASE_URL}/api/cs`,
+        isEdit ? `/api/proxy/cs/${existingCS.header.id}` : `/api/proxy/cs`,
         { method: isEdit?"PUT":"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload), credentials:"include" }
       );
       const data = await res.json();
