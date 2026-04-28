@@ -32,7 +32,9 @@ async function handler(
 
   const setCookie = response.headers.get("set-cookie");
   if (setCookie) res.headers.set("set-cookie", setCookie);
-  res.headers.set("Content-Type", "application/json");
+
+  const contentType = response.headers.get("content-type");
+  if (contentType) res.headers.set("Content-Type", contentType);
 
   return res;
 }
