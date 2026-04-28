@@ -136,7 +136,7 @@ export default function GRNFormPage() {
     if (!supId) { setPos([]); return; }
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/purchase-orders?supplier_id=${supId}&exclude_complete=true`
+        `/api/proxy/purchase-orders?supplier_id=${supId}&exclude_complete=true`
       );
       if (res.ok) setPos(await res.json());
     } catch (err) {
@@ -365,7 +365,7 @@ Do you want to proceed anyway?`
       };
 
       const res = await fetch(
-        isEdit ? `${API_BASE_URL}/api/grn/${grnId}` : `${API_BASE_URL}/api/grn`,
+        isEdit ? `/api/proxy/grn/${grnId}` : `/api/proxy/grn`,
         {
           method: isEdit ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
