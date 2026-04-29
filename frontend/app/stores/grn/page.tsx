@@ -27,7 +27,7 @@ export default function GRNListPage() {
 
   const fetchGRNs = async () => {
     try {
-      const res = await fetch(`/api/proxy/grn`);
+      const res = await fetch(`${API_BASE_URL}/api/grn`, { credentials: "include" });
       if (res.status === 401) { router.replace("/session-expired"); return; }
       if (!res.ok) throw new Error("Failed to fetch GRNs");
       const data = await res.json();
@@ -45,7 +45,7 @@ const handleView = async (grn: any) => {
   setViewDetails([]);
   setModalLoading(true);
   try {
-    const res = await fetch(`/api/proxy/grn/${grn.id}`);
+    const res = await fetch(`${API_BASE_URL}/api/grn/${grn.id}`, { credentials: "include" });
     if (res.status === 401) { router.replace("/session-expired"); return; }
     if (!res.ok) throw new Error("Failed to fetch GRN details");
     const data = await res.json();
@@ -62,7 +62,7 @@ const handleView = async (grn: any) => {
   const handleDelete = async (id: number, grn_number: string) => {
     if (!window.confirm(`Delete GRN ${grn_number}?`)) return;
     try {
-      const res = await fetch(`/api/proxy/grn/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/grn/${id}`, {
         method: "DELETE", credentials: "include",
       });
       if (res.status === 401) { router.replace("/session-expired"); return; }
@@ -120,7 +120,7 @@ const handleView = async (grn: any) => {
               <td className="border px-4 py-2">{grn.created_by}</td>
               <td className="border px-3 py-2">
                 {(() => {
-                  const isLocked = grn.invoice_status === "COMPLETE";
+                  const isLocked = grn.invoice_status !== "PENDING";
                   return (
                     <div className="flex items-center justify-center gap-3">
 
@@ -135,10 +135,10 @@ const handleView = async (grn: any) => {
 
                       {/* Edit — disabled when COMPLETE */}
                       <button
-                        title={isLocked ? "Cannot edit — Invoice is COMPLETE" : "Edit GRN"}
+                        title={isLocked ? "Cannot edit — Invoice Entry Found" : "Edit GRN"}
                         onClick={() => {
                           if (isLocked) {
-                            alert(`GRN ${grn.grn_number} is fully invoiced (COMPLETE) and cannot be edited.`);
+                            alert(`GRN ${grn.grn_number} is fully/partially invoiced (COMPLETE/PARTIAL) and cannot be edited.`);
                             return;
                           }
                           sessionStorage.setItem("from_grn_list", "true");
@@ -151,10 +151,10 @@ const handleView = async (grn: any) => {
 
                       {/* Delete — disabled when COMPLETE */}
                       <button
-                        title={isLocked ? "Cannot delete — Invoice is COMPLETE" : "Delete GRN"}
+                        title={isLocked ? "Cannot delete — Invoice is Found" : "Delete GRN"}
                         onClick={() => {
                           if (isLocked) {
-                            alert(`GRN ${grn.grn_number} is fully invoiced (COMPLETE) and cannot be deleted.`);
+                            alert(`GRN ${grn.grn_number} is fully/partially invoiced (COMPLETE/PARTIAL) and cannot be deleted.`);
                             return;
                           }
                           handleDelete(grn.id, grn.grn_number);
