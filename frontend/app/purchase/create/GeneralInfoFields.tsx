@@ -3,8 +3,9 @@
 import { parseIndianDate, formatDateIndian } from "@/utils/dateUtils";
 import type { PoHeader } from "@/types/po";
 import { useState, useEffect, useRef } from "react";
-
 import AutoExpandField from "@/components/AutoExpandField";
+
+import { toast, dismissToast } from "@/components/ui/use-toast";
 
 
 type AdvanceRequiredToggleProps = {
@@ -88,25 +89,80 @@ export default function GeneralInfoFields({
 const inputClass =
   "w-full h-10 px-4 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-500 mb-2";
 
-  const handleSupplierChange = (supId: number) => {
-    const sup = suppliers.find((s: any) => s.sup_id === supId) || null;
-    setSelectedSupplier(sup);
+const handleSupplierChange = (supId: number) => {
+  const sup = suppliers.find((s: any) => s.sup_id === supId) || null;
+
+  if (!sup) return;
+
+  const requiredFields = [
+    sup.sup_name,
+    sup.sup_add,
+    sup.sup_person,
+    sup.sup_phone,
+    sup.sup_email,
+    sup.sup_gst,
+    sup.acct_no,
+    sup.acct_name,
+    sup.bank_name,
+    sup.ifsc_code,
+    sup.bank_branch
+  ];
+
+  const hasMissingField = requiredFields.some(
+    (field) => field === null || field === undefined || String(field).trim() === ""
+  );
+
+  if (hasMissingField) {
+     toast({
+        title: "Incomplete Supplier",
+        description: "Fill in all supplier details and select.",
+        variant: "destructive"
+    });
+
+
+    setSelectedSupplier(null);
+    setSupplierSearch("");
+
     setPoHeader((prev: any) => ({
       ...prev,
-      sup_id: sup?.sup_id || 0,
-      sup_name: sup?.sup_name || "",
-      sup_add: sup?.sup_add || "",
-      sup_person: sup?.sup_person || "",
-      sup_phone: sup?.sup_phone || "",
-      sup_email: sup?.sup_email || "",
-      sup_gst: sup?.sup_gst || "",
-      acct_no: sup?.acct_no || "",
-      acct_name: sup?.acct_name || "",
-      bank_name: sup?.bank_name || "",
-      ifsc_code: sup?.ifsc_code || "",
-      bank_branch: sup?.bank_branch || ""
+      sup_id: 0,
+      sup_name: "",
+      sup_add: "",
+      sup_person: "",
+      sup_phone: "",
+      sup_email: "",
+      sup_gst: "",
+      acct_no: "",
+      acct_name: "",
+      bank_name: "",
+      ifsc_code: "",
+      bank_branch: ""
     }));
-  };
+
+    setShowSupplierDropdown(false);
+    return;
+  }
+
+  setSelectedSupplier(sup);
+
+  setPoHeader((prev: any) => ({
+    ...prev,
+    sup_id: sup?.sup_id || 0,
+    sup_name: sup?.sup_name || "",
+    sup_add: sup?.sup_add || "",
+    sup_person: sup?.sup_person || "",
+    sup_phone: sup?.sup_phone || "",
+    sup_email: sup?.sup_email || "",
+    sup_gst: sup?.sup_gst || "",
+    acct_no: sup?.acct_no || "",
+    acct_name: sup?.acct_name || "",
+    bank_name: sup?.bank_name || "",
+    ifsc_code: sup?.ifsc_code || "",
+    bank_branch: sup?.bank_branch || ""
+  }));
+
+  setShowSupplierDropdown(false);
+};
 
 const [supplierSearch, setSupplierSearch] = useState("");
 const [showSupplierDropdown, setShowSupplierDropdown] = useState(false);
@@ -346,7 +402,6 @@ return (
 </div>
 
       </div>
-
 
 
 
