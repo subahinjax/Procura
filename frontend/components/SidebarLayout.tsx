@@ -90,8 +90,8 @@ export default function SidebarLayout({
 )}
 
 <h1 className="font-bold text-xl tracking-wide text-white">
-  <span className="bg-gradient-to-r from-yellow-200 via-yellow-200 to-red-200 bg-clip-text text-transparent">
-    Procura HITS Pilot
+  <span className="text-white">
+    Procura Soft
    </span>
 </h1>
 

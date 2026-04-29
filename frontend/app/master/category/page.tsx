@@ -182,7 +182,7 @@ function FormModal({ cat, catTypes, onSave, onClose }: {
 
       if (!aiRes.ok) {
         const errData = await aiRes.json().catch(() => ({}));
-        alert("AI error: " + (errData?.error?.message || aiRes.status));
+        alert("AI Response: This feature is currently enabled only in live");
         return;
       }
 
