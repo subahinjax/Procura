@@ -400,7 +400,6 @@ const [grandTotal, setGrandTotal] = useState(0);
 
 const handleCsSelect = async (csId: string) => {
   setSelectedCsId(csId);
-
   if (!csId) {
     setPoHeader(initialPoHeader);
     setPoItems(initialPoItems);
@@ -410,23 +409,54 @@ const handleCsSelect = async (csId: string) => {
     setOtherCharges([]);
     return;
   }
-
   try {
     const res = await fetch(`/api/proxy/cs/${csId}`);
     if (!res.ok) { alert("Failed to load CS"); return; }
     const { header: ch, items: ciRows } = await res.json();
-
     const N = ciRows?.[0]?.recommended_sup || 1;
+    const supId  = ch[`sup${N}_id`];
+    const quotNo = ch[`sup${N}_quot_no`];
 
-    const supId   = ch[`sup${N}_id`];
-    const quotNo  = ch[`sup${N}_quot_no`];
-
-    // ✅ Find matched objects first, don't call setSelectedSupplier yet
     const matchedSup  = suppliers.find((s: any) => String(s.sup_id) === String(supId)) || null;
     const matchedDept = department.find((d: any) => String(d.dept_id) === String(ch.dept_id)) || null;
 
-    setSelectedDepartment(matchedDept);
+    // ✅ Validate all supplier fields before proceeding
+    const supplierFieldLabels: { key: keyof typeof matchedSup; label: string }[] = [
+      { key: "sup_name",   label: "Supplier Name" },
+      { key: "sup_add",    label: "Supplier Address" },
+      { key: "sup_gst",    label: "GST Number" },
+      { key: "sup_phone",  label: "Phone" },
+      { key: "sup_email",  label: "Email" },
+      { key: "acct_name",  label: "Account Name" },
+      { key: "acct_no",    label: "Account Number" },
+      { key: "bank_name",  label: "Bank Name" },
+      { key: "bank_branch",label: "Bank Branch" },
+      { key: "ifsc_code",  label: "IFSC Code" },
+      { key: "sup_person", label: "Contact Person" },
+    ];
 
+    if (!matchedSup) {
+      alert("❌ Supplier not found. Please ensure the supplier is registered before importing CS.");
+      setSelectedCsId("");
+      return;
+    }
+
+    const missingFields = supplierFieldLabels.filter(({ key }) => {
+      const val = (matchedSup as any)[key];
+      return val === null || val === undefined || String(val).trim() === "";
+    });
+
+    if (missingFields.length > 0) {
+      const fieldList = missingFields.map(f => `  • ${f.label}`).join("\n");
+      alert(
+        `❌ Cannot import CS. The following supplier details are incomplete:\n\n${fieldList}\n\nPlease update the supplier record and try again.`
+      );
+      setSelectedCsId("");
+      return;
+    }
+
+    // ✅ All fields present — proceed with import
+    setSelectedDepartment(matchedDept);
     let matchedSub: SubDepartment | null = null;
     if (matchedDept) {
       const subRes = await fetch(`/api/proxy/subdepartment/${matchedDept.dept_id}`);
@@ -436,26 +466,22 @@ const handleCsSelect = async (csId: string) => {
       setSelectedSubDepartment(matchedSub);
     }
 
-    // ✅ Set poHeader with ALL supplier fields from matchedSup directly
     setPoHeader(prev => ({
       ...prev,
       dept_id:     ch.dept_id || "",
       subdept_id:  matchedSub?.subdept_id?.toString() || "",
-      sup_id:      matchedSup?.sup_id       || "",
-      sup_name:    matchedSup?.sup_name     || "",
-      // ✅ Use the exact field names your DB/payload expects:
-      sup_add:     matchedSup?.address      || matchedSup?.sup_add  || "",
-      sup_gst:     matchedSup?.gst          || matchedSup?.sup_gst  || "",
-      sup_phone:   matchedSup?.phone        || matchedSup?.sup_phone || "",
-      sup_email:   matchedSup?.email        || matchedSup?.sup_email || "",
-      acct_name:   matchedSup?.acct_name    || matchedSup?.acct_name || "",
-      acct_no:     matchedSup?.acct_no      || matchedSup?.acct_no || "",
-      bank_name:   matchedSup?.bank_name    || matchedSup?.bank_name || "",
-      bank_branch: matchedSup?.bank_branch  || matchedSup?.bank_branch || "",
-      ifsc_code:  matchedSup?.ifsc_code     || matchedSup?.ifsc_code || "", 
-
-
-      sup_person:  matchedSup?.sup_person || "",
+      sup_id:      matchedSup.sup_id       || "",
+      sup_name:    matchedSup.sup_name     || "",
+      sup_add:     matchedSup.address      || matchedSup.sup_add    || "",
+      sup_gst:     matchedSup.gst          || matchedSup.sup_gst    || "",
+      sup_phone:   matchedSup.phone        || matchedSup.sup_phone  || "",
+      sup_email:   matchedSup.email        || matchedSup.sup_email  || "",
+      acct_name:   matchedSup.acct_name    || "",
+      acct_no:     matchedSup.acct_no      || "",
+      bank_name:   matchedSup.bank_name    || "",
+      bank_branch: matchedSup.bank_branch  || "",
+      ifsc_code:   matchedSup.ifsc_code    || "",
+      sup_person:  matchedSup.sup_person   || "",
       quot_no:     quotNo || "",
       po_title:    ch.description || "",
     }));
@@ -471,10 +497,9 @@ const handleCsSelect = async (csId: string) => {
       const qty    = Number(ci.qty)                    || 1;
       const rawAmount = ci[`sup${supNum}_amount`];
       const amount =
-      rawAmount !== undefined && rawAmount !== null && rawAmount !== ""
-      ? Number(rawAmount)
-      : round2(qty * rate);
-
+        rawAmount !== undefined && rawAmount !== null && rawAmount !== ""
+          ? Number(rawAmount)
+          : round2(qty * rate);
       return {
         id:          generateId(),
         item_code:   ci.item_code   || "",
@@ -492,10 +517,7 @@ const handleCsSelect = async (csId: string) => {
     });
 
     setPoItems(mappedItems);
-
-    // ✅ Set selectedSupplier LAST so SupplierFields syncs after poHeader is already correct
     setSelectedSupplier(matchedSup);
-
   } catch (err) {
     console.error("CS import error:", err);
     alert("Failed to import CS data");
