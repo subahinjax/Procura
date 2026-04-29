@@ -421,7 +421,7 @@ const handleCsSelect = async (csId: string) => {
     const matchedDept = department.find((d: any) => String(d.dept_id) === String(ch.dept_id)) || null;
 
     // ✅ Validate all supplier fields before proceeding
-    const supplierFieldLabels: { key: keyof typeof matchedSup; label: string }[] = [
+   const supplierFieldLabels: { key: string; label: string }[] = [
       { key: "sup_name",   label: "Supplier Name" },
       { key: "sup_add",    label: "Supplier Address" },
       { key: "sup_gst",    label: "GST Number" },
@@ -442,8 +442,8 @@ const handleCsSelect = async (csId: string) => {
     }
 
     const missingFields = supplierFieldLabels.filter(({ key }) => {
-      const val = (matchedSup as any)[key];
-      return val === null || val === undefined || String(val).trim() === "";
+       const val = (matchedSup as any)[key];
+       return val === null || val === undefined || String(val).trim() === "";
     });
 
     if (missingFields.length > 0) {
