@@ -206,10 +206,10 @@ const showOnlyGrandTotal = !hasDiscount && !hasGST && !hasAdditions;
         <div className="grid grid-cols-[40%_60%] border border-t-0 border-black">
           <div className="px-1 border-r border-black leading-[1]">
             <p className="text-[16px] font-medium">Procura Soft</p>
-            <p>No.1, Rajiv Gandhi Salai, OMR Road</p>
-            <p>Padur, Kelambakkam</p>
-            <p>Chennai 603 103</p>
-            <p>Ph. +91 44 2747 4395 / 27474262</p>
+            <p>No.777, XYZ Street, ABC Road</p>
+            <p>City, State</p>
+            <p>India</p>
+            <p>Ph. +91 XX XXXX XXXX / XXXXXXXX</p>
           </div>
           <div className="px-1 text-[16px] tracking-normal leading-[1]">
             <p>Account Name: {poData.header.acct_name  || "-"}</p>
