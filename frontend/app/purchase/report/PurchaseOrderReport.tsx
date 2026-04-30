@@ -100,7 +100,7 @@ const PurchaseOrderReport: React.FC<Props> = ({ poData }) => {
   };
 
   useEffect(() => {
-    fetch(`/api/path/approvers`, { credentials: "include" })
+    fetch(`/api/proxy/approvers`, { credentials: "include" })
       .then(res => res.json())
       .then(setApprovers);
   }, []);
@@ -190,7 +190,7 @@ const isDiscountPoItem = (item: { item_name?: string }): boolean => {
             </div>
             <div className="grid grid-cols-[30%_70%] divide-x divide-black border-b border-black">
               <p className="px-1 text-[14px] font-semibold leading-[1.5]">OUR GST NO</p>
-              <p className="px-1 text-[14.5px]">33AAATH6508A2Z9</p>
+              <p className="px-1 text-[14.5px]">12XXXXX1234X2X8</p>
             </div>
             <div className="grid grid-cols-[30%_70%] divide-x divide-black border-b border-black">
               <p className="px-1 text-[14px] font-semibold leading-[1.5]">VENDOR GST NO</p>
@@ -212,11 +212,11 @@ const isDiscountPoItem = (item: { item_name?: string }): boolean => {
         {/* Bill To / Bank Details */}
         <div className="grid grid-cols-[40%_60%] border border-t-0 border-black">
           <div className="px-1 border-r border-black leading-[1]">
-            <p className="text-[16px] font-medium">Hindustan Institute of Technology & Science</p>
-            <p>No.1, Rajiv Gandhi Salai, OMR Road</p>
-            <p>Padur, Kelambakkam</p>
-            <p>Chennai 603 103</p>
-            <p>Ph. +91 44 2747 4395 / 27474262</p>
+            <p className="text-[16px] font-medium">Procura Soft</p>
+            <p>No.123, XYZ Street, ABC Road</p>
+            <p>OMR Salai, Chennai</p>
+            <p>Tamilnadu</p>
+            <p>Ph. +91 XX XXXX XXXX / XXXX XXXX</p>
           </div>
           <div className="px-1 text-[16px] tracking-normal leading-[1]">
             <p>Account Name: {poData.header.acct_name  || "-"}</p>
@@ -499,7 +499,7 @@ const isDiscountPoItem = (item: { item_name?: string }): boolean => {
             </div>
             {/* Right */}
             <div className="text-center font-semibold text-[15px] mt-0">
-              <p className="italic">For HINDUSTAN INSTITUTE OF TECHNOLOGY &amp; SCIENCE</p>
+              <p className="italic">For PROCURA SOFT </p>
               <br /><br />
               <p className="text-center font-semibold text-[15px] leading-none mt-4">
                 {releaser?.name || approver?.name || "__________"}
