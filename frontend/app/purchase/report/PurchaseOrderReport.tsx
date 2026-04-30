@@ -100,7 +100,7 @@ const PurchaseOrderReport: React.FC<Props> = ({ poData }) => {
   };
 
   useEffect(() => {
-    fetch(`/api/proxy/approvers`)
+    fetch(`/api/path/approvers`, { credentials: "include" })
       .then(res => res.json())
       .then(setApprovers);
   }, []);
@@ -127,6 +127,13 @@ const hasAdditions  = chargesAddition > 0;
 
 // FINAL condition
 const showOnlyGrandTotal = !hasDiscount && !hasGST && !hasAdditions;
+
+const isDiscountPoItem = (item: { item_name?: string }): boolean => {
+  const nm = (item.item_name || "").toLowerCase();
+  return nm.includes("discount") || nm.includes("buyback");
+};
+
+
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
@@ -205,11 +212,11 @@ const showOnlyGrandTotal = !hasDiscount && !hasGST && !hasAdditions;
         {/* Bill To / Bank Details */}
         <div className="grid grid-cols-[40%_60%] border border-t-0 border-black">
           <div className="px-1 border-r border-black leading-[1]">
-            <p className="text-[16px] font-medium">Procura Soft</p>
-            <p>No.777, XYZ Street, ABC Road</p>
-            <p>City, State</p>
-            <p>India</p>
-            <p>Ph. +91 XX XXXX XXXX / XXXXXXXX</p>
+            <p className="text-[16px] font-medium">Hindustan Institute of Technology & Science</p>
+            <p>No.1, Rajiv Gandhi Salai, OMR Road</p>
+            <p>Padur, Kelambakkam</p>
+            <p>Chennai 603 103</p>
+            <p>Ph. +91 44 2747 4395 / 27474262</p>
           </div>
           <div className="px-1 text-[16px] tracking-normal leading-[1]">
             <p>Account Name: {poData.header.acct_name  || "-"}</p>
@@ -299,7 +306,13 @@ const showOnlyGrandTotal = !hasDiscount && !hasGST && !hasAdditions;
                           <td className="border border-black px-1 text-right">{item.qty}</td>
                           <td className="border border-black px-0 text-center">{item.unit}</td>
                           <td className="border border-black px-1 text-right">{item.rate}</td>
-                          <td className="border border-black px-1 text-right">{formatAmount(item.amount)}</td>
+
+			  <td className="border border-black px-1 text-right">
+			      {isDiscountPoItem(item)
+			      ? `(${formatAmount(item.amount)})`
+			      : formatAmount(item.amount)}
+			  </td>
+
                         </tr>
                       );
                     })}
@@ -323,18 +336,18 @@ const showOnlyGrandTotal = !hasDiscount && !hasGST && !hasAdditions;
                         {/* ── Other Charges rows (one row per charge) ──── */}
 {/* Discount Charges (First) */}
 {hasDiscount &&
- otherCharges
-  .filter(oc => oc.is_discount)
-  .map((oc, i) => (
-    <tr key={`disc-${i}`}>
-      <td colSpan={7} className="border border-black text-right px-1">
-        {oc.item_name} (-)
-      </td>
-      <td className="border border-black text-right px-1">
-        {formatAmount(Number(oc.amount))}
-      </td>
-    </tr>
-  ))}
+  otherCharges
+    .filter(oc => oc.is_discount)
+    .map((oc, i) => (
+      <tr key={`disc-${i}`}>
+        <td colSpan={7} className="border border-black text-right px-1">
+          {oc.item_name}
+        </td>
+        <td className="border border-black text-right px-1">
+          ({formatAmount(Number(oc.amount))})
+        </td>
+      </tr>
+    ))}
 
 {hasDiscount && (
   <tr>
@@ -486,7 +499,7 @@ const showOnlyGrandTotal = !hasDiscount && !hasGST && !hasAdditions;
             </div>
             {/* Right */}
             <div className="text-center font-semibold text-[15px] mt-0">
-              <p className="italic">For Procura Soft</p>
+              <p className="italic">For HINDUSTAN INSTITUTE OF TECHNOLOGY &amp; SCIENCE</p>
               <br /><br />
               <p className="text-center font-semibold text-[15px] leading-none mt-4">
                 {releaser?.name || approver?.name || "__________"}

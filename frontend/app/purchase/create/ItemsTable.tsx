@@ -103,40 +103,65 @@ export default function ItemsTable({
     setPoItems(poItems.filter((_: any, idx: number) => idx !== i));
   };
 
+const isDiscountPoItem = (item: PoItem): boolean => {
+  const nm = (item.item_name || "").toLowerCase();
+  return nm.includes("discount") || nm.includes("buyback");
+};
+
+
+
   /* ── TOTALS ────────────────────────────────────────────────────────────── */
-  const subtotal = poItems.reduce((sum, item) => sum + item.qty * item.rate, 0);
+  const subtotal = poItems.reduce((sum, item) => {
+  const amt = item.qty * item.rate;
+  return isDiscountPoItem(item) ? sum - amt : sum + amt;
+}, 0);
 
-  const chargesAddition  = otherCharges.filter(oc => !oc.is_discount).reduce((s, oc) => s + (Number(oc.amount) || 0), 0);
-  const chargesDeduction = otherCharges.filter(oc =>  oc.is_discount).reduce((s, oc) => s + (Number(oc.amount) || 0), 0);
+const chargesAddition  = otherCharges.filter(oc => !oc.is_discount).reduce((s, oc) => s + (Number(oc.amount) || 0), 0);
+const chargesDeduction = otherCharges.filter(oc =>  oc.is_discount).reduce((s, oc) => s + (Number(oc.amount) || 0), 0);
 
-  const discountItems      = poItems.filter(i => i.is_discount_applicable);
-  const discountItemsTotal = discountItems.reduce((s, i) => s + i.qty * i.rate, 0);
-  const hasItemSpecificDiscount = discountItems.length > 0;
-  const hasDiscount = chargesDeduction > 0;
+// Sum of discount/buyback poItems (item-level deductions)
+const itemLevelDeduction = poItems
+  .filter(i => isDiscountPoItem(i))
+  .reduce((s, i) => s + i.qty * i.rate, 0);
 
-  const getItemDiscountAmount = (item: PoItem): number => {
-    const itemAmount = item.qty * item.rate;
-    if (!hasDiscount) return 0;
-    if (hasItemSpecificDiscount) {
-      if (!item.is_discount_applicable || discountItemsTotal === 0) return 0;
-      return (itemAmount / discountItemsTotal) * chargesDeduction;
-    }
-    if (subtotal === 0) return 0;
-    return (itemAmount / subtotal) * chargesDeduction;
-  };
+// Normal items only (exclude discount/buyback rows)
+const normalItems = poItems.filter(i => !isDiscountPoItem(i));
+const normalItemsTotal = normalItems.reduce((s, i) => s + i.qty * i.rate, 0);
 
-  const taxableBase = poItems.reduce((sum, item) =>
-    sum + (item.qty * item.rate) - getItemDiscountAmount(item), 0);
+const discountItems      = normalItems.filter(i => i.is_discount_applicable);
+const discountItemsTotal = discountItems.reduce((s, i) => s + i.qty * i.rate, 0);
+const hasItemSpecificDiscount = discountItems.length > 0;
+const hasDiscount = chargesDeduction > 0;
 
-  const totalGST = poItems.reduce((sum, item) => {
-    const taxable = (item.qty * item.rate) - getItemDiscountAmount(item);
-    return sum + (taxable * (Number(item.gst_per) || 0)) / 100;
-  }, 0);
+// Total deduction = footer discount rows + item-level discount/buyback rows
+const totalDeduction = chargesDeduction + itemLevelDeduction;
 
-  const grandTotal = Math.round(taxableBase + totalGST + chargesAddition);
+const getItemDiscountAmount = (item: PoItem): number => {
+  if (isDiscountPoItem(item)) return 0;
+  if (totalDeduction === 0) return 0;
 
-  // Sum of per-item disc amounts — shown inline in Sub Total row under Disc Amt col (Fix 3)
-  const totalDiscountDisplayed = poItems.reduce((sum, item) => sum + getItemDiscountAmount(item), 0);
+  if (hasItemSpecificDiscount) {
+    if (!item.is_discount_applicable || discountItemsTotal === 0) return 0;
+    return (item.qty * item.rate / discountItemsTotal) * totalDeduction;
+  }
+
+  if (normalItemsTotal === 0) return 0;
+  return (item.qty * item.rate / normalItemsTotal) * totalDeduction;
+};
+
+const taxableBase = normalItems.reduce((sum, item) =>
+  sum + (item.qty * item.rate) - getItemDiscountAmount(item), 0);
+
+const totalGST = normalItems.reduce((sum, item) => {
+  const taxable = (item.qty * item.rate) - getItemDiscountAmount(item);
+  return sum + (taxable * (Number(item.gst_per) || 0)) / 100;
+}, 0);
+
+const grandTotal = Math.round(taxableBase + totalGST + chargesAddition);
+
+const totalDiscountDisplayed = normalItems.reduce(
+  (sum, item) => sum + getItemDiscountAmount(item), 0
+);
 
   // ── REFS ───────────────────────────────────────────────────────────────────
   // manuallyUnchecked: items the user explicitly unchecked — useEffect won't re-check them
@@ -209,6 +234,7 @@ export default function ItemsTable({
   const discountChargeItems = chargeItems.filter(isDiscountItem);
   const otherChargeItems    = chargeItems.filter(c => !isDiscountItem(c));
 
+  
   /*
    * ── COLUMN LAYOUT (0-based) ─────────────────────────────────────────────
    *
@@ -389,9 +415,11 @@ export default function ItemsTable({
                   </td>
 
                   {/* [7] Amount */}
-                  <td className="px-2 py-2 border-b border-gray-400 text-right font-medium whitespace-nowrap">
-                    {(item.qty * item.rate).toFixed(2)}
-                  </td>
+<td className={`px-2 py-2 border-b border-gray-400 text-right font-medium whitespace-nowrap ${isDiscountPoItem(item) ? "text-red-600" : ""}`}>
+  {isDiscountPoItem(item)
+    ? `(${(item.qty * item.rate).toFixed(2)})`
+    : (item.qty * item.rate).toFixed(2)}
+</td>
 
                   {/* [8] Disc Amt — only when hasDiscount */}
                   {hasDiscount && (
