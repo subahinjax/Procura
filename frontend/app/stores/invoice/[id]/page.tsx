@@ -102,7 +102,6 @@ export default function InvoiceFormPage() {
     item_code: string; item_name: string; description?: string, amount: string; is_discount: boolean;
   }[]>([]);
 
-
   const [selectedGrns, setSelectedGrns] = useState<any[]>([]);
   const [grnSelectKey, setGrnSelectKey] = useState(0);
   const [details, setDetails] = useState<InvoiceDetail[]>([]);
@@ -113,14 +112,37 @@ export default function InvoiceFormPage() {
   const [po_number, setPoNumber] = useState("");
   const [chargeItems, setChargeItems] = useState<any[]>([]);
 
+
+const isDiscountItem = (item: { item_name?: string }): boolean => {
+  const nm = (item.item_name || "").toLowerCase();
+  return nm.includes("discount") || nm.includes("buyback");
+};
+
+
   // Totals — use taxable_amount as base for sub_total
-  const sub_total    = details.reduce((s, d) => s + (Number(d.amount)         || 0), 0);
-  const disc_total   = details.reduce((s, d) => s + (Number(d.discount_amount)|| 0), 0);
-  const taxable_total= details.reduce((s, d) => s + (Number(d.taxable_amount) || 0), 0);
-  const gst_total    = details.reduce((s, d) => s + (Number(d.gst_amount)     || 0), 0);
-  const charges_addition  = otherCharges.filter(oc => !oc.is_discount).reduce((s, oc) => s + (Number(oc.amount) || 0), 0);
-  const charges_deduction = otherCharges.filter(oc =>  oc.is_discount).reduce((s, oc) => s + (Number(oc.amount) || 0), 0);
-  const grand_total  = taxable_total + gst_total + charges_addition - charges_deduction;
+// Normal items only
+const normalDetails      = details.filter(d => !isDiscountItem(d));
+const discountDetails    = details.filter(d =>  isDiscountItem(d));
+const itemLevelDeduction = discountDetails.reduce((s, d) => s + (Number(d.amount) || 0), 0);
+const normalTotal        = normalDetails.reduce((s, d) => s + (Number(d.amount) || 0), 0);
+
+const sub_total     = normalTotal - itemLevelDeduction;
+const disc_total    = normalDetails.reduce((s, d) => s + (Number(d.discount_amount) || 0), 0);
+const taxable_total = sub_total - disc_total;
+
+const gst_total = normalDetails.reduce((s, d) => {
+  const itemAmt    = Number(d.amount) || 0;
+  const itemDisc   = Number(d.discount_amount) || 0;
+  // Proportional share of itemLevelDeduction for this item
+  const itemShare  = normalTotal > 0 ? (itemAmt / normalTotal) * itemLevelDeduction : 0;
+  const taxable    = Math.max(0, itemAmt - itemDisc - itemShare);
+  return s + (taxable * (Number(d.gst_percent) || 0)) / 100;
+}, 0);
+
+const charges_addition  = otherCharges.filter(oc => !oc.is_discount).reduce((s, oc) => s + (Number(oc.amount) || 0), 0);
+const charges_deduction = otherCharges.filter(oc =>  oc.is_discount).reduce((s, oc) => s + (Number(oc.amount) || 0), 0);
+
+const grand_total = taxable_total + gst_total + charges_addition - charges_deduction;
 
 
   //--- CHANGE 1: Add state (after `const [chargeItems, setChargeItems] = useState...`) ---
@@ -251,6 +273,7 @@ useEffect(() => {
 
   const [grnLoading, setGrnLoading] = useState(false);
 
+
   // Apply PO disc_amt to a detail row
   const applyPoDiscount = (d: InvoiceDetail, poItem: any): InvoiceDetail => {
     const poDiscAmt = Number(poItem.disc_amt) || 0;
@@ -354,6 +377,16 @@ useEffect(() => {
 
         // Apply PO rates + disc_amt in one pass
         const withRates = updated.map(d => {
+
+  if (isDiscountItem(d)) {
+    return {
+      ...d,
+      discount: "", discount_percent: "0", discount_amount: "0",
+      taxable_amount: "0", gst_amount: "0",
+    };
+  }
+
+
           const poItem = poItems.find(
             p => p.item_name.trim().toLowerCase() === d.item_name.trim().toLowerCase()
           );
@@ -462,41 +495,50 @@ useEffect(() => {
     return allocated.join(",");
   };
 
-  const updateDetail = (index: number, field: keyof InvoiceDetail, value: string) => {
-    setDetails(prev => prev.map((d, i) => {
-      if (i !== index) return d;
-      const updated = { ...d, [field]: value };
+const updateDetail = (index: number, field: keyof InvoiceDetail, value: string) => {
+  setDetails(prev => prev.map((d, i) => {
+    if (i !== index) return d;
+    const updated = { ...d, [field]: value };
 
-      if (field === "quantity" || field === "rate") {
-        const qty    = field === "quantity" ? Number(value) : Number(d.quantity);
-        const rate   = field === "rate"     ? Number(value) : Number(d.rate);
-        const amount = isNaN(qty * rate) ? "" : (qty * rate).toFixed(2);
-        updated.amount = amount;
-        const resolved = resolveDiscount(d.discount, amount);
-        Object.assign(updated, resolved);
-        updated.gst_amount = amount && d.gst_percent
-          ? ((Number(resolved.taxable_amount) * (Number(d.gst_percent) || 0)) / 100).toFixed(2)
-          : "0.00";
-        if (field === "quantity" && d.from_grn && d.grn_detail_maxqtys) {
-          updated.grn_detail_qtys = distributeQtySequential(qty, d.grn_detail_maxqtys);
-        }
-      }
+    if (field === "quantity" || field === "rate") {
+  const qty    = field === "quantity" ? Number(value) : Number(d.quantity);
+  const rate   = field === "rate"     ? Number(value) : Number(d.rate);
+  const amount = isNaN(qty * rate) ? "" : (qty * rate).toFixed(2);
+  updated.amount = amount;
 
-      if (field === "discount") {
-        // Smart field: re-resolve discount on change
-        const resolved = resolveDiscount(value, d.amount);
-        Object.assign(updated, resolved);
-        updated.gst_amount = ((Number(resolved.taxable_amount) * (Number(d.gst_percent) || 0)) / 100).toFixed(2);
-      }
+  if (isDiscountItem(d)) {
+    // No GST, no discount spread for these rows
+    updated.taxable_amount  = "0";
+    updated.discount_amount = "0";
+    updated.gst_amount      = "0";
+  } else {
+    const resolved = resolveDiscount(d.discount, amount);
+    Object.assign(updated, resolved);
+    updated.gst_amount = amount && d.gst_percent
+      ? ((Number(resolved.taxable_amount) * (Number(d.gst_percent) || 0)) / 100).toFixed(2)
+      : "0.00";
+  }
 
-      if (field === "gst_percent") {
-        const taxable = Number(updated.taxable_amount) || Number(updated.amount) || 0;
-        updated.gst_amount = ((taxable * (Number(value) || 0)) / 100).toFixed(2);
-      }
+  if (field === "quantity" && d.from_grn && d.grn_detail_maxqtys) {
+    updated.grn_detail_qtys = distributeQtySequential(qty, d.grn_detail_maxqtys);
+  }
+}
 
-      return updated;
-    }));
-  };
+
+    if (field === "discount" && !isDiscountItem(d)) {
+      const resolved = resolveDiscount(value, d.amount);
+      Object.assign(updated, resolved);
+      updated.gst_amount = ((Number(resolved.taxable_amount) * (Number(d.gst_percent) || 0)) / 100).toFixed(2);
+    }
+
+    if (field === "gst_percent" && !isDiscountItem(d)) {
+      const taxable = Number(updated.taxable_amount) || Number(updated.amount) || 0;
+      updated.gst_amount = ((taxable * (Number(value) || 0)) / 100).toFixed(2);
+    }
+
+    return updated;
+  }));
+};
 
   const addRow = () => setDetails(prev => [...prev, emptyDetail()]);
   const removeRow = (index: number) => setDetails(prev => prev.filter((_, i) => i !== index));
@@ -838,9 +880,19 @@ onMouseDown={() => {
                   <input type="number" value={d.rate} onChange={e => updateDetail(i, "rate", e.target.value)}
                     className="w-full border rounded px-2 py-1 text-sm text-right" min="0" />
                 </td>
-                <td className="border px-2 py-1">
-                  <input type="number" value={d.amount} readOnly className="w-full border rounded px-2 py-1 text-sm text-right bg-gray-50" />
-                </td>
+
+
+<td className="border px-2 py-1">
+  <input
+    value={isDiscountItem(d) && d.amount
+      ? `(${Number(d.amount).toFixed(2)})`
+      : d.amount}
+    readOnly
+    className={"w-full border rounded px-2 py-1 text-sm text-right bg-gray-50 " + (isDiscountItem(d) ? "text-red-600 font-medium" : "")}
+  />
+</td>
+
+
                 {/* Smart discount input — editable, pre-filled from PO disc_amt */}
                 <td className="border px-2 py-1">
                   <input type="number" value={d.discount}
@@ -870,35 +922,37 @@ onMouseDown={() => {
               </tr>
             ))}
           </tbody>
-          <tfoot className="bg-gray-50 font-medium text-sm">
-            <tr>
-              <td className="border px-2 py-2 text-gray-700">
-                Total Items: <span className="font-bold text-blue-700">{details.length}</span>
-              </td>
-              <td className="border px-2 py-2" />
-              <td className="border px-2 py-2 text-right text-gray-700 font-semibold">
-                {details.reduce((s, d) => s + (Number(d.quantity) || 0), 0).toFixed(3)}
-              </td>
-              <td className="border px-2 py-2" />
-              <td className="border px-2 py-2" />
-              <td className="border px-2 py-2 text-right text-gray-700 font-semibold">
-                {details.reduce((s, d) => s + (Number(d.amount) || 0), 0).toFixed(2)}
-              </td>
-              {/* Disc total footer */}
-              <td className="border px-2 py-2 text-right text-red-600 font-semibold">
-                {disc_total > 0 ? `−${disc_total.toFixed(2)}` : ""}
-              </td>
-              {hasAnyDiscount && (
-                <td className="border px-2 py-2 text-right text-gray-700 font-semibold">
-                  {taxable_total.toFixed(2)}
-                </td>
-              )}
-              <td className="border px-2 py-2 text-right text-gray-700 font-semibold">
-                {details.reduce((s, d) => s + (Number(d.gst_amount) || 0), 0).toFixed(2)}
-              </td>
-              <td colSpan={2} className="border px-2 py-2" />
-            </tr>
-          </tfoot>
+<tfoot className="bg-gray-50 font-medium text-sm">
+  <tr>
+    <td className="border px-2 py-2 text-gray-700">
+      Total Items: <span className="font-bold text-blue-700">{details.length}</span>
+    </td>
+    <td className="border px-2 py-2" />
+    <td className="border px-2 py-2 text-right text-gray-700 font-semibold">
+      {normalDetails.reduce((s, d) => s + (Number(d.quantity) || 0), 0).toFixed(3)}
+    </td>
+    <td className="border px-2 py-2" />
+    <td className="border px-2 py-2" />
+    {/* Amount — use sub_total which already has deduction applied */}
+    <td className="border px-2 py-2 text-right text-gray-700 font-semibold">
+      {sub_total.toFixed(2)}
+    </td>
+    {/* Disc total footer */}
+    <td className="border px-2 py-2 text-right text-red-600 font-semibold">
+      {disc_total > 0 ? `−${disc_total.toFixed(2)}` : ""}
+    </td>
+    {hasAnyDiscount && (
+      <td className="border px-2 py-2 text-right text-gray-700 font-semibold">
+        {taxable_total.toFixed(2)}
+      </td>
+    )}
+    {/* GST — use computed gst_total which has deduction spread applied */}
+    <td className="border px-2 py-2 text-right text-gray-700 font-semibold">
+      {gst_total.toFixed(2)}
+    </td>
+    <td colSpan={2} className="border px-2 py-2" />
+  </tr>
+</tfoot>
         </table>
       </div>
 
