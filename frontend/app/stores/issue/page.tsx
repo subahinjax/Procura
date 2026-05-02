@@ -313,7 +313,7 @@ if (itemIds.length !== uniqueIds.size) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">From Department</label>
-            <input value="Purchase & Stores" readOnly
+            <input value="Stores" readOnly
               className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-600" />
           </div>
           <div>
